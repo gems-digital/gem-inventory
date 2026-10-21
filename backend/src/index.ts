@@ -1,5 +1,8 @@
 import Fastify from 'fastify';
+import rateLimit from '@fastify/rate-limit';
 import { env } from './config/env.js';
+import { pool } from './db/pool.js';
+import { registerAuthRoutes } from './modules/inventory-pricing/auth/routes.js';
 
 /**
  * Điểm khởi động API. Các route nghiệp vụ (auth, inventory, photos, users)
@@ -8,6 +11,8 @@ import { env } from './config/env.js';
 async function buildServer() {
   const app = Fastify({ logger: true });
 
+  await app.register(rateLimit, { global: false });
+
   // Không bao giờ cache response dữ liệu nội bộ.
   app.addHook('onSend', async (_req, reply) => {
     reply.header('Cache-Control', 'no-store');
@@ -15,7 +20,9 @@ async function buildServer() {
 
   app.get('/health', async () => ({ success: true, data: { status: 'ok' } }));
 
-  // TODO(plan): app.register(inventoryPricingModule) — auth, items CRUD, photos sign, users.
+  await registerAuthRoutes(app, pool);
+
+  // TODO(plan): app.register(inventoryPricingModule) — items CRUD, photos sign, users.
 
   return app;
 }

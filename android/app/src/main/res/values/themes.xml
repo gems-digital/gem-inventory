@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. Compose drives the real theming (see ui/theme);
+         this keeps the system bars on brand before Compose takes over. -->
+    <style name="Theme.OmniGem" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#2E7D5B</item>
+        <item name="android:windowBackground">#F4F2EC</item>
+    </style>
+</resources>

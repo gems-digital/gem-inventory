@@ -29,7 +29,7 @@ CREATE TABLE inventory_item (
     size            text,
     menh            text[],                          -- Kim|Moc|Thuy|Hoa|Tho (tùy chọn)
     note            text,
-    photo_url       text NOT NULL,                   -- ảnh Cloudinary
+    photo_urls      text[] NOT NULL CHECK (array_length(photo_urls, 1) <= 8), -- ảnh Cloudinary, ảnh[0] = đại diện, tối đa 8
     quantity        integer NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     cost_price_vnd  bigint NOT NULL CHECK (cost_price_vnd >= 0),   -- NHẠY CẢM: giá nhập
     sale_price_vnd  bigint NOT NULL CHECK (sale_price_vnd >= 0),   -- giá bán niêm yết
