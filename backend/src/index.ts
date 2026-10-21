@@ -3,6 +3,7 @@ import rateLimit from '@fastify/rate-limit';
 import { env } from './config/env.js';
 import { pool } from './db/pool.js';
 import { registerAuthRoutes } from './modules/inventory-pricing/auth/routes.js';
+import { registerItemsRoutes } from './modules/inventory-pricing/items/routes.js';
 
 /**
  * Điểm khởi động API. Các route nghiệp vụ (auth, inventory, photos, users)
@@ -21,8 +22,9 @@ async function buildServer() {
   app.get('/health', async () => ({ success: true, data: { status: 'ok' } }));
 
   await registerAuthRoutes(app, pool);
+  await registerItemsRoutes(app, pool);
 
-  // TODO(plan): app.register(inventoryPricingModule) — items CRUD, photos sign, users.
+  // TODO(plan): app.register(inventoryPricingModule) — item CRUD (write), photos sign, users.
 
   return app;
 }

@@ -1,5 +1,6 @@
 import { hashPassword } from '../modules/inventory-pricing/auth/password.js';
 import { pool } from './pool.js';
+import { seedItems } from './seed-items.js';
 
 interface SeedUser {
   username: string;
@@ -26,21 +27,33 @@ function getSeedUsers(): SeedUser[] {
   ];
 }
 
-async function seedUser(user: SeedUser): Promise<void> {
+async function seedUser(user: SeedUser): Promise<string> {
   const passwordHash = await hashPassword(user.password);
-  await pool.query(
+  const result = await pool.query<{ id: string }>(
     `INSERT INTO app_user (username, password_hash, role)
      VALUES ($1, $2, $3)
-     ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role`,
+     ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role
+     RETURNING id`,
     [user.username, passwordHash, user.role],
   );
+  const id = result.rows[0]?.id;
+  if (!id) {
+    throw new Error(`Seed user ${user.username} không trả về id`);
+  }
+  return id;
 }
 
 async function main(): Promise<void> {
   const users = getSeedUsers();
+  let adminUserId: string | null = null;
   for (const user of users) {
-    await seedUser(user);
+    const id = await seedUser(user);
+    if (user.role === 'admin') {
+      adminUserId = id;
+    }
   }
+
+  const items = await seedItems(pool, adminUserId);
 
   // eslint-disable-next-line no-console
   console.log('✅ Seed xong. Thông tin đăng nhập dev:');
@@ -48,6 +61,8 @@ async function main(): Promise<void> {
     // eslint-disable-next-line no-console
     console.log(`  - ${user.role}: username=${user.username} password=${user.password}`);
   }
+  // eslint-disable-next-line no-console
+  console.log(`✅ Seed ${items.length} inventory_item mẫu: ${items.map((i) => i.code).join(', ')}`);
 }
 
 main()

@@ -1,9 +1,12 @@
 package com.omnigem.inventory.di
 
 import android.content.Context
+import com.omnigem.inventory.data.auth.AuthInterceptor
 import com.omnigem.inventory.data.auth.AuthRepository
 import com.omnigem.inventory.data.auth.TokenStore
+import com.omnigem.inventory.data.inventory.InventoryRepository
 import com.omnigem.inventory.data.network.AuthApi
+import com.omnigem.inventory.data.network.InventoryApi
 import com.omnigem.inventory.data.network.NetworkModule
 
 /**
@@ -14,11 +17,17 @@ class AppContainer(context: Context) {
 
     private val appContext = context.applicationContext
 
-    private val retrofit by lazy { NetworkModule.create() }
+    private val tokenStore: TokenStore by lazy { TokenStore(appContext) }
+
+    private val retrofit by lazy {
+        NetworkModule.create(authInterceptor = AuthInterceptor(tokenStore))
+    }
 
     private val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
 
-    private val tokenStore: TokenStore by lazy { TokenStore(appContext) }
+    private val inventoryApi: InventoryApi by lazy { retrofit.create(InventoryApi::class.java) }
 
     val authRepository: AuthRepository by lazy { AuthRepository(authApi, tokenStore) }
+
+    val inventoryRepository: InventoryRepository by lazy { InventoryRepository(inventoryApi) }
 }

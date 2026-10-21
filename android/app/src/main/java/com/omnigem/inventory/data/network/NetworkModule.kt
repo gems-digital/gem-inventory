@@ -3,6 +3,7 @@ package com.omnigem.inventory.data.network
 import com.omnigem.inventory.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,9 +11,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 // Small manual builder for the Retrofit stack. Base URL is configurable; the
 // default (BuildConfig.API_BASE_URL) targets the emulator-to-host alias.
+// An optional auth interceptor adds the Bearer token to data requests.
 object NetworkModule {
 
-    fun create(baseUrl: String = BuildConfig.API_BASE_URL): Retrofit {
+    fun create(
+        baseUrl: String = BuildConfig.API_BASE_URL,
+        authInterceptor: Interceptor? = null,
+    ): Retrofit {
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
@@ -26,6 +31,7 @@ object NetworkModule {
         }
 
         val client = OkHttpClient.Builder()
+            .apply { authInterceptor?.let { addInterceptor(it) } }
             .addInterceptor(logging)
             .build()
 

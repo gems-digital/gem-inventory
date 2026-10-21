@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             OmniGemTheme {
-                AppNav(authRepository = container.authRepository)
+                AppNav(container = container)
             }
         }
     }
