@@ -2,6 +2,7 @@ package com.omnigem.inventory.data.network
 
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface InventoryApi {
@@ -13,4 +14,7 @@ interface InventoryApi {
         @Query("menh") menh: String? = null,
         @Query("q") query: String? = null,
     ): Response<ItemsEnvelope>
+
+    @GET("inventory/items/{id}")
+    suspend fun getItem(@Path("id") id: String): Response<ItemEnvelope>
 }

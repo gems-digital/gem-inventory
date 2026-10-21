@@ -10,6 +10,12 @@ sealed interface ItemsResult {
     data class Failure(val message: String) : ItemsResult
 }
 
+/** Outcome of a single-item fetch. */
+sealed interface ItemResult {
+    data class Success(val item: Item) : ItemResult
+    data class Failure(val message: String) : ItemResult
+}
+
 class InventoryRepository(private val inventoryApi: InventoryApi) {
 
     suspend fun listItems(productType: String? = null, query: String? = null): ItemsResult {
@@ -32,6 +38,28 @@ class InventoryRepository(private val inventoryApi: InventoryApi) {
             }
         } catch (e: IOException) {
             ItemsResult.Failure("Không kết nối được máy chủ. Kiểm tra mạng và thử lại.")
+        }
+    }
+
+    suspend fun getItem(id: String): ItemResult {
+        return try {
+            val response = inventoryApi.getItem(id)
+            val body = response.body()
+            when {
+                response.isSuccessful && body?.success == true && body.data != null ->
+                    ItemResult.Success(body.data)
+
+                response.code() == 404 -> ItemResult.Failure("Không tìm thấy món.")
+
+                response.code() == 401 ->
+                    ItemResult.Failure("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.")
+
+                else -> ItemResult.Failure(
+                    body?.error ?: "Không tải được chi tiết món (mã ${response.code()}).",
+                )
+            }
+        } catch (e: IOException) {
+            ItemResult.Failure("Không kết nối được máy chủ. Kiểm tra mạng và thử lại.")
         }
     }
 }

@@ -46,3 +46,11 @@ data class ItemsEnvelope(
     @Json(name = "error") val error: String? = null,
     @Json(name = "meta") val meta: ListMeta? = null,
 )
+
+/** Envelope for the single-item detail endpoint. */
+@JsonClass(generateAdapter = true)
+data class ItemEnvelope(
+    @Json(name = "success") val success: Boolean,
+    @Json(name = "data") val data: Item? = null,
+    @Json(name = "error") val error: String? = null,
+)
