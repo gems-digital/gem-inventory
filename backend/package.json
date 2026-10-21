@@ -1,0 +1,36 @@
+{
+  "name": "gem-inventory-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OmniGem Kho & Giá — Node.js API (module inventory-pricing)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@fastify/rate-limit": "^10.2.1",
+    "argon2": "^0.41.1",
+    "cloudinary": "^2.5.1",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.5",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

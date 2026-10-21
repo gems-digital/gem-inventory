@@ -1,0 +1,27 @@
+# === macOS ===
+.DS_Store
+
+# === Node / backend ===
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# === Android / Kotlin ===
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+android/local.properties
+android/.idea/
+android/*.iml
+.cxx/
+
+# === Editors ===
+.vscode/
+*.swp
