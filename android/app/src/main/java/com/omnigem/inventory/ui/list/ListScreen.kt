@@ -30,11 +30,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.omnigem.inventory.data.inventory.InventoryRepository
@@ -54,6 +58,14 @@ fun ListScreen(
 ) {
     val viewModel: ListViewModel = viewModel(factory = ListViewModel.Factory(inventoryRepository))
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Re-fetch when returning to the list (e.g. after add/edit saves), but skip
+    // the initial resume since the ViewModel already loads on creation.
+    var firstResume by remember { mutableStateOf(true) }
+    LifecycleResumeEffect(Unit) {
+        if (firstResume) firstResume = false else viewModel.refresh()
+        onPauseOrDispose {}
+    }
 
     Scaffold(
         modifier = modifier,

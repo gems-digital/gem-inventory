@@ -18,9 +18,10 @@
     "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1154.0",
+    "@aws-sdk/s3-request-presigner": "^3.1154.0",
     "@fastify/rate-limit": "^10.2.1",
     "argon2": "^0.41.1",
-    "cloudinary": "^2.5.1",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "jsonwebtoken": "^9.0.2",

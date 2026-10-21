@@ -14,7 +14,8 @@ Mỗi slice kết thúc bằng: test pass + 1 commit (`feat: slice N <màn>`).
 ## Môi trường
 - Backend: Node 22. Postgres qua Docker — **cách chính thức**: `docker compose up -d` (file `docker-compose.yml` ở gốc repo, service `gem-pg`, DB `gem_inventory`, user `postgres`/`dev`, cổng 5432). Test: vitest (integration chạy trên Postgres này). *Lưu ý môi trường: nếu Docker daemon không khởi động được trong shell sandbox, bật Docker Desktop bằng tay rồi `docker compose up -d`; chỉ khi không có Docker mới dùng Postgres native làm fallback cục bộ.*
 - Android: set `export ANDROID_HOME=$HOME/Library/Android/sdk`. Dựng Gradle wrapper (cài gradle qua brew nếu cần: `brew install gradle` rồi `gradle wrapper --gradle-version 8.11`). Thiếu package SDK thì dùng `sdkmanager`.
-- KHÔNG commit secret. `.env` từ `.env.example`.
+- Ảnh: **MinIO** (S3-compatible) qua Docker compose — API `http://localhost:9000`, console 9001, creds dev `minioadmin/minioadmin`, bucket `gem-inventory-photos` (đọc công khai; ảnh không nhạy cảm). Backend env: `MINIO_ENDPOINT=http://localhost:9000`, `MINIO_ACCESS_KEY=minioadmin`, `MINIO_SECRET_KEY=minioadmin`, `MINIO_BUCKET=gem-inventory-photos`, `MINIO_PUBLIC_URL=http://localhost:9000` (emulator Android dùng `http://10.0.2.2:9000`). Thay hẳn Cloudinary. *Lưu ý sandbox: proxy Docker ở đây chỉ kéo official image → image MinIO có thể không pull được; khi đó chạy MinIO native/đợi allowlist, code vẫn dựng & unit-test được.*
+- KHÔNG commit secret. `.env` từ `.env.example` (đổi CLOUDINARY_* → MINIO_* ở env schema).
 
 ## API contract (REST, envelope `{ success, data?, error?, meta? }`)
 - `POST /auth/login` body `{ username, password }` → `{ success, data: { token, user: { id, username, role } } }`. Sai → 401. Rate-limit.
@@ -23,7 +24,7 @@ Mỗi slice kết thúc bằng: test pass + 1 commit (`feat: slice N <màn>`).
 - `POST /inventory/items` (auth) body ItemInput → `201 { success, data: Item }`. Validate Zod; mã trùng → 409.
 - `PATCH /inventory/items/:id` (auth) → `{ success, data: Item }`.
 - `DELETE /inventory/items/:id` (admin) → `{ success }`.
-- `POST /inventory/photos/sign` (auth) → `{ success, data: { signature, timestamp, apiKey, cloudName, folder } }` để client upload thẳng Cloudinary.
+- `POST /inventory/photos/sign` (auth) — **MinIO (S3-compatible)**: body `{ files: [{ contentType }] }` (≤8) → `{ success, data: [{ uploadUrl, publicUrl, key }] }`. `uploadUrl` = presigned S3 PUT (dùng `@aws-sdk/client-s3` + `s3-request-presigner`, path-style), client PUT ảnh thẳng lên đó; `publicUrl` = URL đọc công khai để lưu vào `photoUrls[]`.
 - Header mọi route dữ liệu: `Cache-Control: no-store`. JWT Bearer.
 
 ### Kiểu Item (response, margin tính lúc đọc — KHÔNG lưu)

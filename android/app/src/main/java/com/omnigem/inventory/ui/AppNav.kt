@@ -7,8 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.omnigem.inventory.di.AppContainer
+import com.omnigem.inventory.ui.addedit.AddEditScreen
 import com.omnigem.inventory.ui.detail.DetailScreen
-import com.omnigem.inventory.ui.list.AddPlaceholderScreen
 import com.omnigem.inventory.ui.list.ListScreen
 import com.omnigem.inventory.ui.login.LoginScreen
 
@@ -62,15 +62,28 @@ fun AppNav(container: AppContainer) {
             )
         }
 
-        // Add (slice 4). The {itemId} variant is the "edit" entry point.
+        // Add (create). The {itemId} variant is the "edit" entry point.
         composable(Routes.ADD) {
-            AddPlaceholderScreen(onBack = { navController.popBackStack() })
+            AddEditScreen(
+                inventoryRepository = container.inventoryRepository,
+                photoRepository = container.photoRepository,
+                itemId = null,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
+            )
         }
         composable(
             route = Routes.EDIT,
             arguments = listOf(navArgument("itemId") { type = NavType.StringType }),
-        ) {
-            AddPlaceholderScreen(onBack = { navController.popBackStack() })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId").orEmpty()
+            AddEditScreen(
+                inventoryRepository = container.inventoryRepository,
+                photoRepository = container.photoRepository,
+                itemId = itemId,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
+            )
         }
     }
 }
