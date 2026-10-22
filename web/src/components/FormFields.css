@@ -1,0 +1,133 @@
+.ff {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ff__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.ff__box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-field);
+  padding: 0 14px;
+  transition: border-color 0.15s ease;
+}
+
+.ff__box:focus-within {
+  border-color: var(--jade);
+}
+
+.ff__box--error {
+  border-color: var(--warn-fg);
+}
+
+.ff__box--select {
+  position: relative;
+  padding-right: 10px;
+}
+
+.ff__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px; /* ≥16px tránh iOS auto-zoom */
+  padding: 12px 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.ff__input::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.ff__input--area {
+  resize: vertical;
+  line-height: 1.4;
+  padding: 12px 0;
+  font-family: inherit;
+}
+
+.ff__suffix {
+  color: var(--muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.ff__select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 18px;
+  cursor: pointer;
+}
+
+.ff__chevron {
+  position: absolute;
+  right: 12px;
+  color: var(--muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.ff__error {
+  color: var(--warn-fg);
+  font-size: 13px;
+}
+
+/* Segmented */
+.segmented {
+  display: flex;
+  gap: 4px;
+  background: var(--jade-soft);
+  border-radius: var(--radius-field);
+  padding: 4px;
+}
+
+.segmented__btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.segmented__btn--on {
+  background: var(--jade);
+  color: var(--ivory);
+}
+
+/* Chip group (mệnh) */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-toggle {
+  border: none;
+  background: var(--jade-soft);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-chip);
+}
+
+.chip-toggle--on {
+  background: var(--jade);
+  color: var(--ivory);
+}

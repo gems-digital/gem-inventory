@@ -94,3 +94,27 @@ export function WarnIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+export function BackIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  );
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M5 12.5 10 17l9-10" />
+    </svg>
+  );
+}

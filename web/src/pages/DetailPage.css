@@ -1,0 +1,212 @@
+.detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--ivory);
+}
+
+.detail__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.detail__state-msg {
+  margin: 0;
+  color: var(--muted);
+}
+
+.detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.detail__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail__code {
+  color: var(--jade);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.detail__name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail__tags .tag-pill {
+  color: var(--ink);
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.detail__margin {
+  margin: 0;
+  color: var(--positive);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Price lines */
+.price-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.price-line__label {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.price-line__spacer {
+  flex: 1;
+}
+
+.price-line__value {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.card-surface {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Safety block */
+.safety {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.safety--warn {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.safety--ok {
+  background: var(--jade-soft);
+  color: var(--jade);
+}
+
+/* Specs */
+.specs {
+  gap: 8px;
+}
+
+.spec-line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.spec-line__label {
+  color: var(--muted);
+  font-size: 15px;
+  width: 108px;
+  flex-shrink: 0;
+}
+
+.spec-line__value {
+  color: var(--ink);
+  font-size: 15px;
+  flex: 1;
+}
+
+/* Gallery */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gallery__main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background: var(--jade-soft);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery__placeholder {
+  color: var(--jade);
+}
+
+.gallery__counter {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(26, 36, 30, 0.72);
+  color: var(--ivory);
+  font-size: 13px;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.gallery__thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gallery__thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery__thumb {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--jade-soft);
+}
+
+.gallery__thumb--on {
+  border: 2px solid var(--jade);
+}
+
+.gallery__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

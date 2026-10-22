@@ -1,0 +1,99 @@
+/* Lớp dùng chung giữa các trang (load toàn cục qua main.tsx). */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--jade);
+  color: var(--ivory);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px;
+}
+
+.topbar__btn {
+  border: none;
+  background: transparent;
+  color: var(--ivory);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.topbar__btn:active {
+  background: rgba(244, 242, 236, 0.18);
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.topbar__action {
+  border: none;
+  background: transparent;
+  color: var(--ivory);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.topbar__action:active {
+  background: rgba(244, 242, 236, 0.18);
+}
+
+.topbar__spacer {
+  width: 44px;
+}
+
+.card-surface {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.chip-internal {
+  background: var(--internal-chip-bg);
+  color: var(--internal-chip-fg);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 4px 0;
+}
+
+.btn-retry {
+  border: none;
+  background: var(--jade);
+  color: var(--ivory);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius-field);
+}
+
+.btn-retry:active {
+  background: var(--jade-dark);
+}
+
+.tag-pill {
+  background: var(--tag-pill-bg);
+  color: var(--muted);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+}

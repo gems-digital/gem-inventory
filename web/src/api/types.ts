@@ -61,6 +61,40 @@ export interface Item {
   updatedAt: string;
 }
 
+/** Body cho POST/PATCH item — như Item nhưng bỏ field margin tính server-side. */
+export interface ItemInput {
+  code: string;
+  name?: string | null;
+  itemKind: ItemKind;
+  productType: ProductType;
+  jadeType?: string | null;
+  color?: string | null;
+  size?: string | null;
+  menh: string[];
+  note?: string | null;
+  photoUrls: string[];
+  quantity: number;
+  costPriceVnd: number;
+  salePriceVnd: number;
+  floorPriceVnd: number;
+  dimensions?: Record<string, unknown>;
+  treatment?: string;
+  transparency?: string;
+  origin?: string;
+  weightGram?: number;
+  certificateCode?: string;
+}
+
+/** Content-type ảnh backend chấp nhận (photos/sign). */
+export type AllowedPhotoType = 'image/jpeg' | 'image/png' | 'image/webp';
+
+/** Một ảnh đã ký: PUT file lên uploadUrl, lưu publicUrl vào photoUrls[]. */
+export interface SignedPhoto {
+  uploadUrl: string;
+  publicUrl: string;
+  key?: string;
+}
+
 export interface AuthUser {
   id: string;
   username: string;

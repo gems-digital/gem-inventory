@@ -3,7 +3,8 @@ import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './routes/RequireAuth';
 import { LoginPage } from './pages/LoginPage';
 import { ListPage } from './pages/ListPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { DetailPage } from './pages/DetailPage';
+import { AddEditPage } from './pages/AddEditPage';
 
 export default function App() {
   return (
@@ -23,10 +24,7 @@ export default function App() {
             path="/detail/:id"
             element={
               <RequireAuth>
-                <PlaceholderPage
-                  title="Chi tiết món"
-                  note="Màn chi tiết sẽ hoàn thiện ở slice sau (gallery nhiều ảnh, margin, dư địa giảm giá)."
-                />
+                <DetailPage />
               </RequireAuth>
             }
           />
@@ -34,10 +32,15 @@ export default function App() {
             path="/add"
             element={
               <RequireAuth>
-                <PlaceholderPage
-                  title="Thêm món"
-                  note="Form thêm/sửa món sẽ hoàn thiện ở slice sau (độc bản/hàng loạt, kích thước theo loại, nhiều ảnh)."
-                />
+                <AddEditPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/add/:id"
+            element={
+              <RequireAuth>
+                <AddEditPage />
               </RequireAuth>
             }
           />

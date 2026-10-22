@@ -1,0 +1,180 @@
+.form-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--ivory);
+}
+
+.form-page__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.form-page__error-msg {
+  margin: 0;
+  color: var(--muted);
+}
+
+.form-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-section__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-section__hint {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Photo grid */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.photo-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--jade-soft);
+}
+
+.photo-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-cell__remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(26, 36, 30, 0.72);
+  color: var(--ivory);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.photo-cell__badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: var(--jade);
+  color: var(--ivory);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.photo-add {
+  aspect-ratio: 1 / 1;
+  border: 1px dashed var(--jade);
+  border-radius: 12px;
+  background: var(--jade-soft);
+  color: var(--jade);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Dimension grid: 2 cột cho gọn */
+.dim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Price fields */
+.price-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.price-field__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.price-field__label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.price-warning {
+  margin: 0;
+  color: var(--internal-chip-fg);
+  font-size: 14px;
+}
+
+.form-field-error {
+  margin: 0;
+  color: var(--warn-fg);
+  font-size: 14px;
+}
+
+.form-field-error--block {
+  text-align: center;
+}
+
+.form-save {
+  height: 52px;
+  border: none;
+  border-radius: var(--radius-field);
+  background: var(--jade);
+  color: var(--ivory);
+  font-size: 16px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+
+.form-save:active:not(:disabled) {
+  background: var(--jade-dark);
+}
+
+.form-save:disabled {
+  opacity: 0.7;
+}
