@@ -33,9 +33,8 @@ class ListViewModel(private val repository: InventoryRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState: StateFlow<ListUiState> = _uiState.asStateFlow()
 
-    init {
-        refresh()
-    }
+    // Loading is driven by the screen's ON_RESUME, so the list always reflects
+    // the latest data when it (re)appears — including right after an add/edit.
 
     fun onFilterChange(filter: ProductTypeFilter) {
         if (filter == _uiState.value.filter) return

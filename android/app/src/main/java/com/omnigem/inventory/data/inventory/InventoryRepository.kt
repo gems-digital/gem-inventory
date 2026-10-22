@@ -11,10 +11,12 @@ sealed interface ItemsResult {
     data class Failure(val message: String) : ItemsResult
 }
 
-/** Outcome of a single-item fetch. */
+/** Outcome of a single-item fetch or save. */
 sealed interface ItemResult {
     data class Success(val item: Item) : ItemResult
-    data class Failure(val message: String) : ItemResult
+    // `field` names the form field a save error belongs to (e.g. "code" for a
+    // duplicate code), so the UI can show it inline; null = general error.
+    data class Failure(val message: String, val field: String? = null) : ItemResult
 }
 
 class InventoryRepository(private val inventoryApi: InventoryApi) {
@@ -81,7 +83,8 @@ class InventoryRepository(private val inventoryApi: InventoryApi) {
                 response.isSuccessful && body?.success == true && body.data != null ->
                     ItemResult.Success(body.data)
 
-                response.code() == 409 -> ItemResult.Failure("Mã \"${input.code}\" đã tồn tại.")
+                response.code() == 409 ->
+                    ItemResult.Failure("Mã \"${input.code}\" đã tồn tại.", field = "code")
 
                 response.code() == 401 ->
                     ItemResult.Failure("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.")

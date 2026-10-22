@@ -2,9 +2,10 @@ import type { ItemsRepository } from './repository.js';
 import { toItem } from './mapper.js';
 import type { Item, ItemFilters } from './types.js';
 import type { ItemInput, ItemUpdateInput } from './schema.js';
-import { ItemNotFoundError, DuplicateItemCodeError } from './errors.js';
+import { validateDimensionsForProductType } from './schema.js';
+import { ItemNotFoundError, DuplicateItemCodeError, InvalidDimensionsError } from './errors.js';
 
-export { ItemNotFoundError, DuplicateItemCodeError };
+export { ItemNotFoundError, DuplicateItemCodeError, InvalidDimensionsError };
 
 export function createItemsService(repository: ItemsRepository) {
   return {
@@ -42,6 +43,15 @@ export function createItemsService(repository: ItemsRepository) {
         const existing = await repository.findByCode(input.code);
         if (existing) {
           throw new DuplicateItemCodeError(input.code);
+        }
+      }
+
+      if (input.dimensions !== undefined) {
+        // productType có thể không gửi lại khi PATCH — suy từ item hiện tại.
+        const productType = input.productType ?? current.product_type;
+        const result = validateDimensionsForProductType(productType, input.dimensions);
+        if (!result.success) {
+          throw new InvalidDimensionsError();
         }
       }
 

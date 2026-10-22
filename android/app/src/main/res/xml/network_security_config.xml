@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Dev-only cleartext allowance: the backend runs as plain HTTP in development.
-  10.0.2.2 is the Android emulator alias for the developer host's localhost.
-  Production traffic must be HTTPS; do not widen this list.
+  - 10.0.2.2 is the Android emulator alias for the host's localhost.
+  - localhost covers adb reverse.
+  For physical-device-over-LAN testing, add your dev machine's LAN IP here locally
+  (do not commit it). Production traffic is HTTPS; do not widen this list.
 -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">

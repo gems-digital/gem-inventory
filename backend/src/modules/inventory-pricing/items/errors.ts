@@ -13,3 +13,9 @@ export class DuplicateItemCodeError extends Error {
     super(`Mã "${code}" đã tồn tại`);
   }
 }
+
+export class InvalidDimensionsError extends Error {
+  constructor() {
+    super('dimensions không hợp lệ với productType');
+  }
+}

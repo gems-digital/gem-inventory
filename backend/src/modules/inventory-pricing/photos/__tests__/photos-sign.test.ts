@@ -5,6 +5,7 @@ import { pool } from '../../../../db/pool.js';
 import { hashPassword } from '../../auth/password.js';
 import { registerAuthRoutes } from '../../auth/routes.js';
 import { registerPhotosRoutes } from '../routes.js';
+import { env } from '../../../../config/env.js';
 
 /**
  * Test POST /inventory/photos/sign. Ký URL diễn ra hoàn toàn cục bộ (SigV4, không
@@ -98,11 +99,12 @@ describe('POST /inventory/photos/sign', () => {
     expect(body.success).toBe(true);
     expect(body.data).toHaveLength(2);
 
+    const expectedPrefix = `${env.MINIO_ENDPOINT}/${env.MINIO_BUCKET}/`;
     for (const [index, signed] of body.data.entries()) {
       expect(signed.uploadUrl).toContain('X-Amz-Signature=');
-      expect(signed.uploadUrl).toContain('http://localhost:9000/gem-inventory-photos/');
+      expect(signed.uploadUrl).toContain(expectedPrefix);
       expect(signed.key).toMatch(/^items\/[0-9a-f-]+\.(jpg|png)$/);
-      expect(signed.publicUrl).toBe(`http://localhost:9000/gem-inventory-photos/${signed.key}`);
+      expect(signed.publicUrl).toBe(`${env.MINIO_PUBLIC_URL}/${env.MINIO_BUCKET}/${signed.key}`);
       expect(signed.key.endsWith(index === 0 ? '.jpg' : '.png')).toBe(true);
     }
 

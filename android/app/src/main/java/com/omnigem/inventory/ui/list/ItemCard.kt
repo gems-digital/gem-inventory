@@ -12,20 +12,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.ui.platform.LocalContext
 import com.omnigem.inventory.data.network.Item
+import com.omnigem.inventory.ui.common.dimensionsSummary
+import com.omnigem.inventory.ui.icons.AppIcons
 import com.omnigem.inventory.ui.theme.Ink
 import com.omnigem.inventory.ui.theme.Ivory
 import com.omnigem.inventory.ui.theme.Jade
@@ -116,8 +121,13 @@ private fun ItemThumbnail(item: Item) {
         contentAlignment = Alignment.Center,
     ) {
         if (photo.isNullOrBlank()) {
-            // Jade placeholder when there is no representative photo.
-            Text(text = "💎", style = MaterialTheme.typography.headlineLarge)
+            // Jade gem placeholder when there is no representative photo.
+            Icon(
+                painter = rememberVectorPainter(AppIcons.Gem),
+                contentDescription = null,
+                tint = Jade,
+                modifier = Modifier.size(32.dp),
+            )
         } else {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -132,16 +142,24 @@ private fun ItemThumbnail(item: Item) {
 
         // Photo-count badge when there is more than one image.
         if (item.photoUrls.size > 1) {
-            Box(
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(4.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Ink.copy(alpha = 0.72f))
                     .padding(horizontal = 6.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
             ) {
+                Icon(
+                    painter = rememberVectorPainter(AppIcons.Camera),
+                    contentDescription = null,
+                    tint = Ivory,
+                    modifier = Modifier.size(12.dp),
+                )
                 Text(
-                    text = "📷 ${item.photoUrls.size}",
+                    text = "${item.photoUrls.size}",
                     color = Ivory,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -156,11 +174,12 @@ private fun PriceRow(item: Item) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        PriceCell(label = "Giá bán", value = formatVnd(item.salePriceVnd), valueColor = Ink)
-        PriceCell(label = "Giá sàn", value = formatVnd(item.floorPriceVnd), valueColor = Muted)
+        PriceCell(Modifier.weight(1f), label = "Giá bán", value = formatVnd(item.salePriceVnd), valueColor = Ink)
+        PriceCell(Modifier.weight(1f), label = "Giá sàn", value = formatVnd(item.floorPriceVnd), valueColor = Muted)
         PriceCell(
+            Modifier.weight(1f),
             label = "Lời",
             value = formatVnd(item.marginVnd),
             valueColor = if (item.belowFloorWarn) WarnOrange else PositiveGreen,
@@ -169,14 +188,23 @@ private fun PriceRow(item: Item) {
 }
 
 @Composable
-private fun PriceCell(label: String, value: String, valueColor: androidx.compose.ui.graphics.Color) {
-    Column {
+private fun PriceCell(
+    modifier: Modifier,
+    label: String,
+    value: String,
+    valueColor: androidx.compose.ui.graphics.Color,
+) {
+    Column(modifier = modifier) {
         Text(text = label, color = Muted, style = MaterialTheme.typography.bodyMedium)
+        // Keep 7-digit amounts on one line: never wrap mid-number.
         Text(
             text = value,
             color = valueColor,
-            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Clip,
         )
     }
 }
@@ -205,5 +233,7 @@ private fun buildTags(item: Item): String =
     listOfNotNull(
         productTypeLabel(item.productType),
         item.jadeType?.takeIf { it.isNotBlank() },
-        item.size?.takeIf { it.isNotBlank() }?.let { "size $it" },
+        // Prefer the structured size summary; fall back to the legacy size text.
+        dimensionsSummary(item.productType, item.dimensions)
+            ?: item.size?.takeIf { it.isNotBlank() },
     ).joinToString(" · ")

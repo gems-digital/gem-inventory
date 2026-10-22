@@ -6,6 +6,7 @@ import { DuplicateItemCodeError } from './errors.js';
 const SELECT_COLUMNS = `
   id, code, name, item_kind, product_type, jade_type, color, size, menh, note,
   photo_urls, quantity, cost_price_vnd, sale_price_vnd, floor_price_vnd,
+  dimensions, treatment, transparency, origin, weight_gram, certificate_code,
   created_at, updated_at
 `;
 
@@ -71,8 +72,9 @@ export function createItemsRepository(pool: Pool) {
           `INSERT INTO inventory_item (
              code, name, item_kind, product_type, jade_type, color, size, menh, note,
              photo_urls, quantity, cost_price_vnd, sale_price_vnd, floor_price_vnd,
+             dimensions, treatment, transparency, origin, weight_gram, certificate_code,
              created_by, updated_by
-           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$15)
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$21)
            RETURNING ${SELECT_COLUMNS}`,
           [
             input.code,
@@ -89,6 +91,12 @@ export function createItemsRepository(pool: Pool) {
             input.costPriceVnd,
             input.salePriceVnd,
             input.floorPriceVnd,
+            input.dimensions ?? null,
+            input.treatment ?? null,
+            input.transparency ?? null,
+            input.origin ?? null,
+            input.weightGram ?? null,
+            input.certificateCode ?? null,
             createdByUserId,
           ],
         );
@@ -123,6 +131,12 @@ export function createItemsRepository(pool: Pool) {
       if (input.costPriceVnd !== undefined) fields.push(['cost_price_vnd', input.costPriceVnd]);
       if (input.salePriceVnd !== undefined) fields.push(['sale_price_vnd', input.salePriceVnd]);
       if (input.floorPriceVnd !== undefined) fields.push(['floor_price_vnd', input.floorPriceVnd]);
+      if (input.dimensions !== undefined) fields.push(['dimensions', input.dimensions]);
+      if (input.treatment !== undefined) fields.push(['treatment', input.treatment]);
+      if (input.transparency !== undefined) fields.push(['transparency', input.transparency]);
+      if (input.origin !== undefined) fields.push(['origin', input.origin]);
+      if (input.weightGram !== undefined) fields.push(['weight_gram', input.weightGram]);
+      if (input.certificateCode !== undefined) fields.push(['certificate_code', input.certificateCode]);
 
       const params: unknown[] = [];
       const setClauses = fields.map(([column, value]) => {

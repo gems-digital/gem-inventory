@@ -24,6 +24,13 @@ data class ItemInput(
     @Json(name = "costPriceVnd") val costPriceVnd: Long,
     @Json(name = "salePriceVnd") val salePriceVnd: Long,
     @Json(name = "floorPriceVnd") val floorPriceVnd: Long,
+    // Slice 5 — optional structured size + attributes (omitted when null).
+    @Json(name = "dimensions") val dimensions: Dimensions? = null,
+    @Json(name = "treatment") val treatment: String? = null,
+    @Json(name = "transparency") val transparency: String? = null,
+    @Json(name = "origin") val origin: String? = null,
+    @Json(name = "weightGram") val weightGram: Double? = null,
+    @Json(name = "certificateCode") val certificateCode: String? = null,
 )
 
 // --- Photo presign (direct upload to object storage) ---

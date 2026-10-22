@@ -8,7 +8,7 @@ import {
 } from './schema.js';
 import { createItemsRepository } from './repository.js';
 import { createItemsService } from './service.js';
-import { ItemNotFoundError, DuplicateItemCodeError } from './errors.js';
+import { ItemNotFoundError, DuplicateItemCodeError, InvalidDimensionsError } from './errors.js';
 import { requireAuth } from '../auth/guard.js';
 
 /**
@@ -96,6 +96,10 @@ export async function registerItemsRoutes(app: FastifyInstance, pool: Pool): Pro
       }
       if (error instanceof DuplicateItemCodeError) {
         reply.code(409).send({ success: false, error: error.message });
+        return;
+      }
+      if (error instanceof InvalidDimensionsError) {
+        reply.code(400).send({ success: false, error: error.message });
         return;
       }
       throw error;

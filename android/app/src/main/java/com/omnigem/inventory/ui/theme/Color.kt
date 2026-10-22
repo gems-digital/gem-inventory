@@ -19,3 +19,5 @@ val PositiveGreen = Color(0xFF1F7A57) // positive margin text
 
 val InternalChipBg = Color(0xFFFBF1E0) // "NỘI BỘ" chip background
 val InternalChipFg = Color(0xFFB0742A) // "NỘI BỘ" chip foreground
+
+val TagPillBg = Color(0xFFF0EEE6) // characteristic pill background (detail tags)

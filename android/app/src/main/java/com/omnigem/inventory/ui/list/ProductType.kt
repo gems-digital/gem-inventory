@@ -27,3 +27,19 @@ fun itemKindLabel(apiValue: String): String = when (apiValue) {
     "batch" -> "Hàng loạt"
     else -> apiValue
 }
+
+/**
+ * Mệnh options as (apiValue, displayLabel). The backend enum is ASCII
+ * (Kim/Moc/Thuy/Hoa/Tho) — we send apiValue and show the diacritic label.
+ */
+val MENH_OPTIONS: List<Pair<String, String>> = listOf(
+    "Kim" to "Kim",
+    "Moc" to "Mộc",
+    "Thuy" to "Thủy",
+    "Hoa" to "Hỏa",
+    "Tho" to "Thổ",
+)
+
+/** Display label for a menh enum value sent by / to the API. */
+fun menhLabel(apiValue: String): String =
+    MENH_OPTIONS.firstOrNull { it.first == apiValue }?.second ?: apiValue

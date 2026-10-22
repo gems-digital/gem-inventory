@@ -15,9 +15,12 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        // Default base URL points at the host machine from the Android emulator.
-        // 10.0.2.2 on the emulator maps to the developer host's localhost.
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000/\"")
+        // API base URL — overridable at build time, no secrets baked in.
+        // Dev default = Android emulator → host localhost (10.0.2.2).
+        // Physical phone on LAN:  ./gradlew assembleDebug   -PapiBaseUrl=http://<dev-ip>:3000/
+        // Production release:      ./gradlew assembleRelease -PapiBaseUrl=https://<api-domain>/
+        val apiBaseUrl = (project.findProperty("apiBaseUrl") as String?) ?: "http://10.0.2.2:3000/"
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {

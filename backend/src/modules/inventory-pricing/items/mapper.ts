@@ -1,4 +1,4 @@
-import type { InventoryItemRow, Item } from './types.js';
+import type { InventoryItemRow, Item, Dimensions } from './types.js';
 
 const BELOW_FLOOR_THRESHOLD = 0.1;
 
@@ -34,6 +34,12 @@ export function toItem(row: InventoryItemRow): Item {
     marginVnd,
     marginPct,
     belowFloorWarn,
+    dimensions: (row.dimensions as Dimensions | null) ?? null,
+    treatment: row.treatment,
+    transparency: row.transparency,
+    origin: row.origin,
+    weightGram: row.weight_gram !== null ? Number(row.weight_gram) : null,
+    certificateCode: row.certificate_code,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

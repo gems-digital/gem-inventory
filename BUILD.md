@@ -54,6 +54,25 @@ Bảng `inventory_item`: như `backend/migrations/001_init.sql`, nhưng **đổi
 - Font: Inter. Số tiền: tabular-nums. Màn phone 390-ish dp.
 - Loại SP VN: Nhẫn/Vòng/Chuỗi hạt/Mặt dây. Mệnh: Kim/Mộc/Thủy/Hỏa/Thổ.
 
+## Slice 5 — Đặc điểm & kích thước theo loại (research: inventory-app/research/jade-product-attributes.md)
+Mục tiêu: thay ô `size` text đơn bằng **kích thước có cấu trúc theo loại** + vài đặc điểm chung. **TẤT CẢ trường mới đều OPTIONAL** (không phá item seed cũ, không chặn lưu). Enum: **gửi mã ASCII, UI hiển thị nhãn tiếng Việt** (tránh lỗi 400 như vụ mệnh).
+
+**DB (migration mới, cột nullable):**
+- `dimensions jsonb` — object theo productType (shape dưới).
+- `treatment text` (A|B|C|BC), `transparency text` (opaque|semi|translucent|ice|glassy), `origin text` (myanmar|china|vietnam|other), `weight_gram numeric`, `certificate_code text`.
+- Giữ cột `size text` cũ (legacy, nullable) — form mới không dùng; list/detail suy chuỗi hiển thị từ `dimensions`.
+
+**`dimensions` theo productType (mọi field bên trong optional, số = mm trừ khi ghi khác):**
+- `ring`: `{ ringSizeVn:int, innerDiameterMm:number, faceWidthMm:number, faceLengthMm?:number, setting?:enum(silver|plated|alloy|gold|stone) }`
+- `bracelet` (vòng/bangle): `{ innerDiameterMm:number, widthMm:number, thicknessMm:number, crossSection?:enum(round|flat|bamboo|oval), innerShape?:enum(round|oval) }`
+- `beads` (chuỗi): `{ beadDiameterMm:number, beadCount:int, lengthCm:number, beadShape?:enum(round|cylinder|other), accessories?:text }`
+- `pendant` (mặt dây): `{ lengthMm:number, widthMm:number, thicknessMm:number, motif?:text, hasBail?:bool, bail?:text }`
+*("ly" = 1 mm — UI nhập "ly" map 1:1 sang mm. "ni" nhẫn = ringSizeVn; ni vòng = innerDiameterMm.)*
+
+**API:** Item response thêm `dimensions` + `treatment/transparency/origin/weightGram/certificateCode`. ItemInput nhận các field này (optional); zod validate dimensions theo productType (dùng discriminated union, field bên trong optional). Mapper cập nhật.
+
+**UI (sau khi fix design xong):** form đổi theo `productType` → hiện đúng nhóm field kích thước (nhãn kèm "ly"/"mm"); thêm mục "Đặc điểm" optional: Phân loại (A/B/C/B+C), Độ trong (nước), Nguồn gốc, Trọng lượng (g), Mã kiểm định. Enum hiện nhãn VN, gửi mã ASCII. Detail/List hiển thị chuỗi size gọn từ dimensions (vd "ĐK trong 56 · bản 12mm").
+
 ## Chất lượng (rule chung)
 - File nhỏ, immutable, validate biên, không hardcode secret, lỗi xử lý rõ.
 - Test ≥ 80% phần logic (margin, validate, RBAC, auth). Commit theo conventional commits.

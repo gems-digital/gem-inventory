@@ -1,5 +1,5 @@
 import type { Pool } from 'pg';
-import type { ItemKind, ProductType } from '../modules/inventory-pricing/items/types.js';
+import type { Dimensions, ItemKind, ProductType } from '../modules/inventory-pricing/items/types.js';
 
 interface SeedItem {
   code: string;
@@ -16,6 +16,8 @@ interface SeedItem {
   costPriceVnd: number;
   salePriceVnd: number;
   floorPriceVnd: number;
+  // Slice 5 — optional, mẫu khớp productType (BUILD.md §Slice 5).
+  dimensions?: Dimensions;
 }
 
 /**
@@ -39,6 +41,7 @@ function getSeedItems(): SeedItem[] {
       costPriceVnd: 1_200_000,
       salePriceVnd: 2_200_000,
       floorPriceVnd: 1_600_000,
+      dimensions: { innerDiameterMm: 56, widthMm: 12, thicknessMm: 9 },
     },
     {
       code: 'NH-014',
@@ -55,6 +58,7 @@ function getSeedItems(): SeedItem[] {
       costPriceVnd: 1_800_000,
       salePriceVnd: 3_500_000,
       floorPriceVnd: 2_800_000,
+      dimensions: { ringSizeVn: 16, innerDiameterMm: 17.3, faceWidthMm: 10 },
     },
     {
       code: 'MD-073',
@@ -71,6 +75,7 @@ function getSeedItems(): SeedItem[] {
       costPriceVnd: 900_000,
       salePriceVnd: 1_500_000,
       floorPriceVnd: 1_400_000,
+      dimensions: { lengthMm: 45, widthMm: 28, thicknessMm: 7 },
     },
     {
       code: 'CH-220',
@@ -87,6 +92,7 @@ function getSeedItems(): SeedItem[] {
       costPriceVnd: 600_000,
       salePriceVnd: 1_100_000,
       floorPriceVnd: 850_000,
+      dimensions: { beadDiameterMm: 8, beadCount: 108, lengthCm: 54 },
     },
     {
       code: 'VX-045',
@@ -103,6 +109,7 @@ function getSeedItems(): SeedItem[] {
       costPriceVnd: 1_500_000,
       salePriceVnd: 2_800_000,
       floorPriceVnd: 2_000_000,
+      dimensions: { innerDiameterMm: 58, widthMm: 14, thicknessMm: 10 },
     },
   ];
 }
@@ -114,8 +121,9 @@ export async function seedItems(pool: Pool, createdByUserId: string | null): Pro
     await pool.query(
       `INSERT INTO inventory_item (
          code, name, item_kind, product_type, jade_type, color, size, menh, note,
-         photo_urls, quantity, cost_price_vnd, sale_price_vnd, floor_price_vnd, created_by, updated_by
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$15)
+         photo_urls, quantity, cost_price_vnd, sale_price_vnd, floor_price_vnd,
+         dimensions, created_by, updated_by
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$16)
        ON CONFLICT (code) DO UPDATE SET
          name = EXCLUDED.name,
          item_kind = EXCLUDED.item_kind,
@@ -130,6 +138,7 @@ export async function seedItems(pool: Pool, createdByUserId: string | null): Pro
          cost_price_vnd = EXCLUDED.cost_price_vnd,
          sale_price_vnd = EXCLUDED.sale_price_vnd,
          floor_price_vnd = EXCLUDED.floor_price_vnd,
+         dimensions = EXCLUDED.dimensions,
          updated_at = now()`,
       [
         item.code,
@@ -146,6 +155,7 @@ export async function seedItems(pool: Pool, createdByUserId: string | null): Pro
         item.costPriceVnd,
         item.salePriceVnd,
         item.floorPriceVnd,
+        item.dimensions ?? null,
         createdByUserId,
       ],
     );

@@ -7,6 +7,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,8 +32,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,9 +47,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.omnigem.inventory.data.inventory.InventoryRepository
 import com.omnigem.inventory.data.network.Item
+import com.omnigem.inventory.ui.common.ORIGIN_OPTIONS
+import com.omnigem.inventory.ui.common.TRANSPARENCY_OPTIONS
+import com.omnigem.inventory.ui.common.TREATMENT_OPTIONS
+import com.omnigem.inventory.ui.common.dimensionsSummary
+import com.omnigem.inventory.ui.common.labelOf
+import com.omnigem.inventory.ui.common.numText
+import com.omnigem.inventory.ui.icons.AppIcons
 import com.omnigem.inventory.ui.list.itemKindLabel
+import com.omnigem.inventory.ui.list.menhLabel
 import com.omnigem.inventory.ui.list.productTypeLabel
 import com.omnigem.inventory.ui.theme.Ink
 import com.omnigem.inventory.ui.theme.InternalChipBg
@@ -60,6 +70,7 @@ import com.omnigem.inventory.ui.theme.Line
 import com.omnigem.inventory.ui.theme.Muted
 import com.omnigem.inventory.ui.theme.PositiveGreen
 import com.omnigem.inventory.ui.theme.Surface
+import com.omnigem.inventory.ui.theme.TagPillBg
 import com.omnigem.inventory.ui.theme.WarnOrange
 import com.omnigem.inventory.ui.theme.WarnOrangeBg
 import com.omnigem.inventory.ui.util.formatPercent
@@ -80,10 +91,10 @@ fun DetailScreen(
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Reload when returning from the edit screen; skip the initial resume.
-    var firstResume by remember { mutableStateOf(true) }
+    // Load on every appearance (initial + each return), so the detail shows the
+    // latest data right after an edit without any manual reload.
     LifecycleResumeEffect(Unit) {
-        if (firstResume) firstResume = false else viewModel.load()
+        viewModel.load()
         onPauseOrDispose {}
     }
 
@@ -144,10 +155,7 @@ private fun DetailContent(item: Item) {
             if (!item.name.isNullOrBlank()) {
                 Text(item.name, color = Ink, style = MaterialTheme.typography.headlineLarge)
             }
-            val tags = buildTags(item)
-            if (tags.isNotBlank()) {
-                Text(tags, color = Muted, style = MaterialTheme.typography.bodyLarge)
-            }
+            TagChips(item)
         }
 
         PriceCard(item)
@@ -172,7 +180,12 @@ private fun Gallery(photoUrls: List<String>) {
         ) {
             val current = photoUrls.getOrNull(index)
             if (current.isNullOrBlank()) {
-                Text("💎", style = MaterialTheme.typography.headlineLarge)
+                Icon(
+                    painter = rememberVectorPainter(AppIcons.Gem),
+                    contentDescription = null,
+                    tint = Jade,
+                    modifier = Modifier.size(56.dp),
+                )
             } else {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -264,14 +277,27 @@ private fun PriceLine(label: String, value: String, valueColor: androidx.compose
 @Composable
 private fun SafetyBlock(item: Item) {
     val headroom = headroomPercent(item) ?: return
+
+    // Guard against bad data: floor >= sale makes "headroom" negative/meaningless.
+    val floorAtOrAboveSale = headroom < 0
     val belowFloor = item.belowFloorWarn
 
-    val bg = if (belowFloor) WarnOrangeBg else JadeSoft
-    val fg = if (belowFloor) WarnOrange else Jade
-    val text = if (belowFloor) {
-        "⚠ Sát sàn — chỉ còn ~$headroom% trước khi chạm sàn"
-    } else {
-        "✓ Còn dư địa giảm tới ~$headroom% vẫn trên giá sàn"
+    val (bg, fg, text) = when {
+        floorAtOrAboveSale -> Triple(
+            WarnOrangeBg,
+            WarnOrange,
+            "⚠ Giá sàn đang ≥ giá bán — kiểm tra lại giá",
+        )
+        belowFloor -> Triple(
+            WarnOrangeBg,
+            WarnOrange,
+            "⚠ Sát sàn — chỉ còn ~$headroom% trước khi chạm sàn",
+        )
+        else -> Triple(
+            JadeSoft,
+            Jade,
+            "✓ Còn dư địa giảm tới ~${headroom.coerceIn(0, 100)}% vẫn trên giá sàn",
+        )
     }
 
     Box(
@@ -292,8 +318,13 @@ private fun SpecsList(item: Item) {
             SpecRow("Loại SP", productTypeLabel(item.productType))
             SpecRow("Loại ngọc", item.jadeType)
             SpecRow("Màu", item.color)
-            SpecRow("Kích thước", item.size)
-            SpecRow("Mệnh", item.menh.takeIf { it.isNotEmpty() }?.joinToString(" · "))
+            SpecRow("Kích thước", dimensionsSummary(item.productType, item.dimensions) ?: item.size)
+            SpecRow("Mệnh", item.menh.takeIf { it.isNotEmpty() }?.joinToString(" · ") { menhLabel(it) })
+            item.treatment?.let { SpecRow("Phân loại", labelOf(TREATMENT_OPTIONS, it)) }
+            item.transparency?.let { SpecRow("Độ trong", labelOf(TRANSPARENCY_OPTIONS, it)) }
+            item.origin?.let { SpecRow("Nguồn gốc", labelOf(ORIGIN_OPTIONS, it)) }
+            item.weightGram?.let { SpecRow("Trọng lượng", numText(it)?.let { g -> "$g g" }) }
+            item.certificateCode?.let { SpecRow("Mã kiểm định", it) }
             SpecRow("Ghi chú", item.note)
         }
     }
@@ -357,15 +388,36 @@ private fun ErrorContent(message: String, onRetry: () -> Unit) {
     }
 }
 
-// --- helpers ---
-
-private fun buildTags(item: Item): String =
-    listOfNotNull(
+// Rounded pill tags for the item's characteristics.
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TagChips(item: Item) {
+    val tags = listOfNotNull(
         productTypeLabel(item.productType),
         item.jadeType?.takeIf { it.isNotBlank() },
         item.color?.takeIf { it.isNotBlank() },
-        item.size?.takeIf { it.isNotBlank() }?.let { "size $it" },
-    ).joinToString(" · ")
+        dimensionsSummary(item.productType, item.dimensions),
+    )
+    if (tags.isEmpty()) return
+
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        tags.forEach { tag ->
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(7.dp))
+                    .background(TagPillBg)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+            ) {
+                Text(tag, color = Ink, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
+}
+
+// --- helpers ---
 
 /** Signed VND for margin, e.g. "+1.500.000 đ". */
 private fun signedVnd(amount: Long?): String {

@@ -26,9 +26,8 @@ class DetailViewModel(
     private val _state = MutableStateFlow<DetailState>(DetailState.Loading)
     val state: StateFlow<DetailState> = _state.asStateFlow()
 
-    init {
-        load()
-    }
+    // load() is called by the screen's ON_RESUME, so the detail always shows the
+    // latest data when it (re)appears — including right after an edit.
 
     fun load() {
         _state.value = DetailState.Loading

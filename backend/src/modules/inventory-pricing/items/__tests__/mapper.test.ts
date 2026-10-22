@@ -19,6 +19,12 @@ function makeRow(overrides: Partial<InventoryItemRow> = {}): InventoryItemRow {
     cost_price_vnd: '1200000',
     sale_price_vnd: '2200000',
     floor_price_vnd: '1600000',
+    dimensions: null,
+    treatment: null,
+    transparency: null,
+    origin: null,
+    weight_gram: null,
+    certificate_code: null,
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -58,5 +64,32 @@ describe('toItem mapper (margin tính lúc đọc)', () => {
   it('defaults menh to empty array when null', () => {
     const item = toItem(makeRow({ menh: null }));
     expect(item.menh).toEqual([]);
+  });
+
+  it('passes through dimensions/attributes and converts weightGram to number', () => {
+    const item = toItem(
+      makeRow({
+        dimensions: { innerDiameterMm: 56, widthMm: 12, thicknessMm: 9 },
+        treatment: 'A',
+        transparency: 'ice',
+        origin: 'myanmar',
+        weight_gram: '18.5',
+        certificate_code: 'GIA-123',
+      }),
+    );
+
+    expect(item.dimensions).toEqual({ innerDiameterMm: 56, widthMm: 12, thicknessMm: 9 });
+    expect(item.treatment).toBe('A');
+    expect(item.transparency).toBe('ice');
+    expect(item.origin).toBe('myanmar');
+    expect(item.weightGram).toBe(18.5);
+    expect(item.certificateCode).toBe('GIA-123');
+  });
+
+  it('defaults dimensions/attributes to null when absent (legacy item)', () => {
+    const item = toItem(makeRow());
+    expect(item.dimensions).toBeNull();
+    expect(item.treatment).toBeNull();
+    expect(item.weightGram).toBeNull();
   });
 });

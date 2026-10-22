@@ -28,7 +28,48 @@ data class Item(
     @Json(name = "marginVnd") val marginVnd: Long? = null,
     @Json(name = "marginPct") val marginPct: Double? = null,
     @Json(name = "belowFloorWarn") val belowFloorWarn: Boolean = false,
+    // Slice 5 — structured per-type size + optional attributes (all nullable).
+    @Json(name = "dimensions") val dimensions: Dimensions? = null,
+    @Json(name = "treatment") val treatment: String? = null,       // A|B|C|BC
+    @Json(name = "transparency") val transparency: String? = null, // opaque|semi|translucent|ice|glassy
+    @Json(name = "origin") val origin: String? = null,             // myanmar|china|vietnam|other
+    @Json(name = "weightGram") val weightGram: Double? = null,
+    @Json(name = "certificateCode") val certificateCode: String? = null,
 )
+
+/**
+ * Per-type size as one flat object; only the selected productType's keys are
+ * ever populated, and Moshi omits nulls, so the serialised object contains
+ * exactly that type's fields. Shapes follow BUILD.md Slice 5.
+ */
+@JsonClass(generateAdapter = true)
+data class Dimensions(
+    // ring
+    @Json(name = "ringSizeVn") val ringSizeVn: Int? = null,
+    @Json(name = "innerDiameterMm") val innerDiameterMm: Double? = null,
+    @Json(name = "faceWidthMm") val faceWidthMm: Double? = null,
+    @Json(name = "faceLengthMm") val faceLengthMm: Double? = null,
+    @Json(name = "setting") val setting: String? = null,          // silver|plated|alloy|gold|stone
+    // bracelet
+    @Json(name = "widthMm") val widthMm: Double? = null,
+    @Json(name = "thicknessMm") val thicknessMm: Double? = null,
+    @Json(name = "crossSection") val crossSection: String? = null, // round|flat|bamboo|oval
+    @Json(name = "innerShape") val innerShape: String? = null,     // round|oval
+    // beads
+    @Json(name = "beadDiameterMm") val beadDiameterMm: Double? = null,
+    @Json(name = "beadCount") val beadCount: Int? = null,
+    @Json(name = "lengthCm") val lengthCm: Double? = null,
+    @Json(name = "beadShape") val beadShape: String? = null,       // round|cylinder|other
+    @Json(name = "accessories") val accessories: String? = null,
+    // pendant
+    @Json(name = "lengthMm") val lengthMm: Double? = null,
+    @Json(name = "motif") val motif: String? = null,
+    @Json(name = "hasBail") val hasBail: Boolean? = null,
+    @Json(name = "bail") val bail: String? = null,
+) {
+    /** True when nothing was entered — caller should send null instead. */
+    fun isEmpty(): Boolean = this == Dimensions()
+}
 
 /** Pagination / summary metadata; all fields optional to stay tolerant. */
 @JsonClass(generateAdapter = true)
