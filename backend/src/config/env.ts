@@ -17,6 +17,9 @@ const envSchema = z.object({
   MINIO_SECRET_KEY: z.string().min(1),
   MINIO_BUCKET: z.string().min(1),
   MINIO_PUBLIC_URL: z.string().min(1),
+  // Danh sách origin cho CORS, phân tách bằng dấu phẩy. Rỗng/absent → dùng
+  // default dev (localhost:5173, localhost:4173 — Vite dev/preview).
+  CORS_ORIGINS: z.string().optional().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -1,0 +1,143 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--ivory);
+}
+
+.login__band {
+  background: var(--jade);
+  color: var(--ivory);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 72px 24px 40px;
+  gap: 12px;
+}
+
+.login__logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--jade-dark);
+  border: 1.5px solid var(--ivory);
+  display: grid;
+  place-items: center;
+  color: var(--ivory);
+}
+
+.login__brand {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.login__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.login__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(244, 242, 236, 0.85);
+  max-width: 280px;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.field__box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-field);
+  padding: 0 14px;
+  transition: border-color 0.15s ease;
+}
+
+.field__box:focus-within {
+  border-color: var(--jade);
+}
+
+.field__box[data-error='true'] {
+  border-color: var(--warn-fg);
+}
+
+.field__icon {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.field__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px; /* ≥16px tránh iOS tự zoom khi focus */
+  padding: 14px 0;
+  min-width: 0;
+}
+
+.field__input::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.login__error {
+  margin: 0;
+  color: var(--warn-fg);
+  font-size: 14px;
+}
+
+.login__submit {
+  height: 52px;
+  border: none;
+  border-radius: var(--radius-field);
+  background: var(--jade);
+  color: var(--ivory);
+  font-size: 16px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.login__submit:active:not(:disabled) {
+  background: var(--jade-dark);
+}
+
+.login__submit:disabled {
+  opacity: 0.7;
+}
+
+.login__footer {
+  margin: 4px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
