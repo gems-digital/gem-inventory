@@ -11,6 +11,8 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+.env.prod
+deploy/.env.prod
 
 # === Android / Kotlin ===
 android/.gradle/

@@ -1,0 +1,15 @@
+# Caddy tự xin & gia hạn chứng chỉ Let's Encrypt cho 2 hostname.
+# Yêu cầu: api.<domain> và s3.<domain> trỏ DNS về IP VPS, cổng 80/443 mở.
+{
+	email {$ACME_EMAIL}
+}
+
+# API Node (Fastify)
+{$API_DOMAIN} {
+	reverse_proxy api:3000
+}
+
+# MinIO S3 endpoint (path-style). Presigned URL ký theo host này nên Host phải giữ nguyên.
+{$S3_DOMAIN} {
+	reverse_proxy minio:9000
+}
