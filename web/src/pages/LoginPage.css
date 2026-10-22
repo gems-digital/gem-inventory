@@ -82,6 +82,7 @@
 
 .field__box:focus-within {
   border-color: var(--jade);
+  box-shadow: 0 0 0 3px rgba(46, 125, 91, 0.15);
 }
 
 .field__box[data-error='true'] {

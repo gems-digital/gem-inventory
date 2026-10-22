@@ -97,6 +97,7 @@ export function AddEditPage() {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>(EMPTY);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -293,19 +294,34 @@ export function AddEditPage() {
               </div>
             ))}
             {form.photos.length < MAX_PHOTOS && (
-              <button type="button" className="photo-add" onClick={() => fileInputRef.current?.click()}>
-                <PlusIcon size={22} />
-                <CameraIcon size={16} />
-                <span>Thêm ảnh</span>
-              </button>
+              <>
+                <button type="button" className="photo-add" onClick={() => fileInputRef.current?.click()}>
+                  <PlusIcon size={22} />
+                  <span>Thư viện</span>
+                </button>
+                <button type="button" className="photo-add" onClick={() => cameraInputRef.current?.click()}>
+                  <CameraIcon size={20} />
+                  <span>Chụp</span>
+                </button>
+              </>
             )}
           </div>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             multiple
+            hidden
+            onChange={(e) => {
+              onPickFiles(e.target.files);
+              e.target.value = '';
+            }}
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
             hidden
             onChange={(e) => {
               onPickFiles(e.target.files);
