@@ -1,6 +1,13 @@
 # Hạ tầng dev cho gem-inventory. Chạy: `docker compose up -d`
 # Postgres: DATABASE_URL=postgres://postgres:dev@localhost:5432/gem_inventory
 # MinIO (S3-compatible, lưu ảnh): API http://localhost:9000, console http://localhost:9001 (minioadmin/minioadmin)
+#
+# GHI CHÚ IMAGE MinIO:
+#   - Image chính thức `minio/minio` đã ngừng phát hành (10/2025) → dùng image Bitnami.
+#   - `bitnamicharts/minio` là HELM CHART (không chạy bằng docker/compose) — KHÔNG dùng ở đây.
+#   - Mặc định dưới đây là `bitnamilegacy/minio` (bản free, backup, không update — kéo được không cần login).
+#     Thay bằng `bitnami/minio:2025.4.22` (pin tag) nếu bạn có quyền kéo bản current.
+#   - Bitnami tự chạy server, KHÔNG cần `command:`; tự tạo bucket qua MINIO_DEFAULT_BUCKETS; data ở /bitnami/minio/data.
 services:
   postgres:
     image: postgres:16
@@ -20,38 +27,23 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio
+    image: bitnamilegacy/minio:latest
     container_name: gem-minio
-    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      # Tự tạo bucket + cho đọc công khai (ảnh không nhạy cảm; giá nằm ở DB)
+      MINIO_DEFAULT_BUCKETS: "gem-inventory-photos:download"
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - gem-minio-data:/data
+      - gem-minio-data:/bitnami/minio/data
     healthcheck:
-      test: ["CMD-SHELL", "mc ready local || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-  # Tạo bucket + cho phép đọc công khai (ảnh không nhạy cảm; giá nằm ở DB)
-  createbucket:
-    image: minio/mc
-    container_name: gem-minio-init
-    depends_on:
-      minio:
-        condition: service_started
-    entrypoint: >
-      sh -c "
-      until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done &&
-      mc mb -p local/gem-inventory-photos &&
-      mc anonymous set download local/gem-inventory-photos &&
-      echo 'bucket gem-inventory-photos ready'
-      "
-    restart: "no"
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
 volumes:
   gem-pg-data:
