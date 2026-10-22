@@ -47,6 +47,15 @@ services:
         condition: service_healthy
     # Không publish cổng ra ngoài — Caddy proxy nội bộ qua network
 
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    restart: unless-stopped
+    # Không publish cổng — Caddy proxy nội bộ qua network
+
   caddy:
     image: caddy:2
     restart: unless-stopped
@@ -56,6 +65,7 @@ services:
     environment:
       API_DOMAIN: ${API_DOMAIN}
       S3_DOMAIN: ${S3_DOMAIN}
+      APP_DOMAIN: ${APP_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
@@ -64,6 +74,7 @@ services:
     depends_on:
       - api
       - minio
+      - web
 
 volumes:
   pg-data:

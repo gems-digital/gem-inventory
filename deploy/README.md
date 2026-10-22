@@ -42,14 +42,13 @@ curl -X POST https://api.<domain>/auth/login -H 'content-type: application/json'
 ```
 Thử ảnh: đăng nhập → `POST https://api.<domain>/inventory/photos/sign` → uploadUrl trỏ `https://s3.<domain>/...`.
 
-## 5. Build APK cho chị Trang (máy build Android)
-```bash
-cd ../android
-export ANDROID_HOME=$HOME/Library/Android/sdk
-./gradlew assembleDebug -PapiBaseUrl=https://api.<domain>/
-# APK: app/build/outputs/apk/debug/app-debug.apk → cài lên máy chị Trang (adb install hoặc copy)
-```
-(Không cần cleartext vì production là HTTPS.)
+## 5. Đưa app cho chị Trang (PWA — iOS + Android, KHÔNG cần cài app store)
+PWA được build & phục vụ tự động bởi compose ở **`https://app.<domain>`** (build dùng `VITE_API_BASE_URL`).
+1. Gửi chị Trang link `https://app.<domain>`, mở bằng **Safari (iOS)** hoặc Chrome (Android).
+2. **Thêm vào màn hình chính**: iOS Safari → nút Share → "Add to Home Screen"; Android Chrome → menu → "Cài đặt ứng dụng". → có icon như app, mở full-screen.
+3. Đăng nhập bằng user đã seed (owner / chị Trang).
+
+*(Tùy chọn — app Android native cũ: `cd ../android && ./gradlew assembleDebug -PapiBaseUrl=https://api.<domain>/` → APK trong `app/build/outputs/apk/debug/`. Không bắt buộc vì PWA đã phủ iOS + Android.)*
 
 ## Bảo mật — bắt buộc
 - [ ] Đổi hết secret trong `.env.prod` (KHÔNG dùng giá trị dev/minioadmin).

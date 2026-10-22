@@ -4,6 +4,11 @@
 	email {$ACME_EMAIL}
 }
 
+# PWA (web app chị Trang mở — https://app.<domain>)
+{$APP_DOMAIN} {
+	reverse_proxy web:80
+}
+
 # API Node (Fastify)
 {$API_DOMAIN} {
 	reverse_proxy api:3000
