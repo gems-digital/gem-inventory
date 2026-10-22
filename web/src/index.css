@@ -72,9 +72,10 @@ input {
   font-feature-settings: 'tnum' 1;
 }
 
-/* Vùng an toàn cho notch iOS khi chạy standalone. */
+/* Vùng an toàn cho notch iOS khi chạy standalone — CỘNG thêm đệm gốc,
+   không ghi đè (desktop env()=0 vẫn giữ 14px; iPhone thêm phần notch). */
 .safe-top {
-  padding-top: env(safe-area-inset-top);
+  padding-top: calc(14px + env(safe-area-inset-top));
 }
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
