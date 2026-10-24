@@ -1,0 +1,13 @@
+# Sao chép thành terraform.tfvars và chỉnh. KHÔNG commit terraform.tfvars.
+region         = "ap-southeast-1" # Singapore (gần VN)
+instance_type  = "t3.small"       # 2GB; chỉ chạy giờ hành chính nên rẻ
+use_elastic_ip = true             # IP cố định qua tắt/bật (~$3.6/th cho 1 IPv4)
+
+# Hẹn giờ (giờ VN). Mặc định 8:45 bật, 17:00 tắt, T2–T6.
+# schedule_start = "cron(45 8 ? * MON-FRI *)"
+# schedule_stop  = "cron(0 17 ? * MON-FRI *)"
+
+# Tùy chọn:
+# custom_domain    = "omnigem.vn"   # để trống = tự dùng <eip>.sslip.io (không cần mua domain)
+# ssh_key_name     = "my-keypair"   # nếu muốn SSH (không bắt buộc — có SSM Session Manager)
+# allowed_ssh_cidr = "1.2.3.4/32"   # IP của bạn
