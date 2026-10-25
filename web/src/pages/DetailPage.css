@@ -28,6 +28,33 @@
   padding: 16px;
 }
 
+.detail__danger-zone {
+  padding: 0 16px 24px;
+}
+
+.btn-danger-outline {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid var(--danger);
+  background: transparent;
+  color: var(--danger);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 0;
+  border-radius: var(--radius-field);
+}
+
+.btn-danger-outline:active {
+  background: var(--danger-bg);
+}
+
+.btn-danger-outline:disabled {
+  opacity: 0.6;
+}
+
 .detail__head {
   display: flex;
   flex-direction: column;

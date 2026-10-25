@@ -105,4 +105,38 @@ export async function registerItemsRoutes(app: FastifyInstance, pool: Pool): Pro
       throw error;
     }
   });
+
+  // Ẩn món (soft delete). Staff + admin đều được (chỉ requireAuth, spec UC-06 D2).
+  // Idempotent: ẩn lại món đã ẩn vẫn 204.
+  app.delete('/inventory/items/:id', { preHandler: requireAuth }, async (request, reply) => {
+    const parsedParams = itemIdParamsSchema.safeParse(request.params);
+    if (!parsedParams.success) {
+      reply.code(400).send({ success: false, error: 'id không hợp lệ' });
+      return;
+    }
+
+    const userId = request.user?.sub as string;
+    await service.softDeleteItem(parsedParams.data.id, userId);
+    reply.code(204).send();
+  });
+
+  // Khôi phục món đã ẩn (nút HOÀN TÁC). Staff + admin đều được (requireAuth).
+  app.post('/inventory/items/:id/restore', { preHandler: requireAuth }, async (request, reply) => {
+    const parsedParams = itemIdParamsSchema.safeParse(request.params);
+    if (!parsedParams.success) {
+      reply.code(400).send({ success: false, error: 'id không hợp lệ' });
+      return;
+    }
+
+    try {
+      const item = await service.restoreItem(parsedParams.data.id);
+      reply.send({ success: true, data: item });
+    } catch (error) {
+      if (error instanceof ItemNotFoundError) {
+        reply.code(404).send({ success: false, error: error.message });
+        return;
+      }
+      throw error;
+    }
+  });
 }

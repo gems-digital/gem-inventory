@@ -118,3 +118,14 @@ export function CheckIcon(props: IconProps) {
     </svg>
   );
 }
+
+/** Mắt gạch chéo — hành động "Ẩn món" (soft delete). */
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 3l18 18" />
+      <path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c5 0 9 4 10 7-.4 1.2-1.2 2.5-2.3 3.7M6.3 6.3C4.2 7.6 2.6 9.5 2 12c1 3 5 7 10 7 1.4 0 2.7-.3 3.9-.8" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+    </svg>
+  );
+}

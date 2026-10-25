@@ -44,3 +44,19 @@ export function updateItem(id: string, input: ItemInput): Promise<Item> {
     auth: true,
   });
 }
+
+/** DELETE /inventory/items/:id → 204 (ẩn món, soft delete, không có body). */
+export function deleteItem(id: string): Promise<void> {
+  return apiRequest<void>(`/inventory/items/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    auth: true,
+  });
+}
+
+/** POST /inventory/items/:id/restore → Item (hoàn tác ẩn món). */
+export function restoreItem(id: string): Promise<Item> {
+  return apiRequest<Item>(`/inventory/items/${encodeURIComponent(id)}/restore`, {
+    method: 'POST',
+    auth: true,
+  });
+}

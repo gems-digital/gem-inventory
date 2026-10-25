@@ -14,6 +14,10 @@
   --warn-bg: #fbeae1;
   --positive: #1f7a57;
 
+  --danger: #d64545;
+  --danger-dark: #b23a3a;
+  --danger-bg: #fbe4e1;
+
   --internal-chip-bg: #fbf1e0;
   --internal-chip-fg: #b0742a;
   --tag-pill-bg: #f0eee6;

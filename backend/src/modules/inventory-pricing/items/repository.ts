@@ -24,7 +24,8 @@ function isUniqueViolation(error: unknown): error is UniqueViolation {
 export function createItemsRepository(pool: Pool) {
   return {
     async findAll(filters: ItemFilters): Promise<InventoryItemRow[]> {
-      const conditions: string[] = [];
+      // Soft-delete: luôn loại món đã ẩn khỏi danh sách (spec UC-06 §4).
+      const conditions: string[] = ['deleted_at IS NULL'];
       const params: unknown[] = [];
 
       if (filters.productType) {
@@ -51,14 +52,17 @@ export function createItemsRepository(pool: Pool) {
     },
 
     async findById(id: string): Promise<InventoryItemRow | null> {
+      // Soft-delete: món đã ẩn đọc như không tồn tại (GET /:id → 404).
       const result = await pool.query<InventoryItemRow>(
-        `SELECT ${SELECT_COLUMNS} FROM inventory_item WHERE id = $1`,
+        `SELECT ${SELECT_COLUMNS} FROM inventory_item WHERE id = $1 AND deleted_at IS NULL`,
         [id],
       );
       return result.rows[0] ?? null;
     },
 
     async findByCode(code: string): Promise<InventoryItemRow | null> {
+      // KHÔNG lọc deleted_at: `code` vẫn UNIQUE toàn cục ở MVP (spec §3), nên
+      // check trùng mã phải thấy cả món đã ẩn — tạo mã trùng vẫn bị chặn (409).
       const result = await pool.query<InventoryItemRow>(
         `SELECT ${SELECT_COLUMNS} FROM inventory_item WHERE code = $1`,
         [code],
@@ -162,6 +166,34 @@ export function createItemsRepository(pool: Pool) {
         }
         throw error;
       }
+    },
+
+    /**
+     * Ẩn món (soft delete). Chỉ cập nhật món đang hiện (deleted_at IS NULL).
+     * Trả null nghĩa là món đã ẩn từ trước hoặc không tồn tại.
+     */
+    async softDelete(id: string, deletedByUserId: string): Promise<InventoryItemRow | null> {
+      const result = await pool.query<InventoryItemRow>(
+        `UPDATE inventory_item SET deleted_at = now(), deleted_by = $1
+         WHERE id = $2 AND deleted_at IS NULL
+         RETURNING ${SELECT_COLUMNS}`,
+        [deletedByUserId, id],
+      );
+      return result.rows[0] ?? null;
+    },
+
+    /**
+     * Khôi phục món đã ẩn (nút HOÀN TÁC). Chỉ cập nhật món đang ẩn
+     * (deleted_at IS NOT NULL). Trả null nghĩa là món không ẩn hoặc không tồn tại.
+     */
+    async restore(id: string): Promise<InventoryItemRow | null> {
+      const result = await pool.query<InventoryItemRow>(
+        `UPDATE inventory_item SET deleted_at = NULL, deleted_by = NULL
+         WHERE id = $1 AND deleted_at IS NOT NULL
+         RETURNING ${SELECT_COLUMNS}`,
+        [id],
+      );
+      return result.rows[0] ?? null;
     },
   };
 }

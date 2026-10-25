@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { Item } from '../api/types';
-import { fetchItem } from '../api/inventory';
+import { deleteItem, fetchItem } from '../api/inventory';
 import { ApiError } from '../api/client';
 import { Spinner } from '../components/Spinner';
-import { GemIcon, BackIcon, WarnIcon, CheckIcon } from '../components/icons';
+import { GemIcon, BackIcon, WarnIcon, CheckIcon, EyeOffIcon } from '../components/icons';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { Snackbar } from '../components/Snackbar';
 import { formatVnd, formatPercent } from '../lib/format';
 import { productTypeLabel, menhLabel, dimensionsSummary } from '../lib/labels';
 import {
@@ -28,6 +30,10 @@ export function DetailPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
+  const [showHideConfirm, setShowHideConfirm] = useState(false);
+  const [hiding, setHiding] = useState(false);
+  const [hideError, setHideError] = useState('');
+
   const load = useCallback(async () => {
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -50,6 +56,19 @@ export function DetailPage() {
     load();
     return () => abortRef.current?.abort();
   }, [load]);
+
+  async function confirmHide() {
+    if (!item) return;
+    setShowHideConfirm(false);
+    setHiding(true);
+    try {
+      await deleteItem(item.id);
+      navigate('/list', { state: { undoItem: item } });
+    } catch (err) {
+      setHiding(false);
+      setHideError(err instanceof ApiError ? err.message : 'Không ẩn được món. Vui lòng thử lại.');
+    }
+  }
 
   return (
     <div className="detail">
@@ -82,7 +101,36 @@ export function DetailPage() {
         </div>
       )}
 
-      {status === 'ready' && item && <DetailContent item={item} />}
+      {status === 'ready' && item && (
+        <>
+          <DetailContent item={item} />
+          <div className="detail__danger-zone">
+            <button
+              type="button"
+              className="btn-danger-outline"
+              disabled={hiding}
+              onClick={() => setShowHideConfirm(true)}
+            >
+              <EyeOffIcon size={18} />
+              Ẩn món
+            </button>
+          </div>
+        </>
+      )}
+
+      <ConfirmDialog
+        open={showHideConfirm}
+        title="Ẩn món này?"
+        message="Món sẽ ẩn khỏi danh sách. Ảnh, giá và lịch sử vẫn được giữ lại, bạn có thể hoàn tác sau."
+        confirmLabel="Ẩn món"
+        busy={hiding}
+        onCancel={() => setShowHideConfirm(false)}
+        onConfirm={confirmHide}
+      />
+
+      {hideError && (
+        <Snackbar message={hideError} tone="danger" onDismiss={() => setHideError('')} />
+      )}
     </div>
   );
 }

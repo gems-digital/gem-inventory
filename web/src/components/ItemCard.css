@@ -1,3 +1,45 @@
+.card-swipe {
+  position: relative;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.card-swipe__action {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  border: none;
+  background: var(--danger);
+  color: var(--ivory);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.card-swipe__action:active {
+  background: var(--danger-dark);
+}
+
+.card-swipe__face {
+  touch-action: pan-y;
+  transition: transform 0.2s ease;
+}
+
+.card-swipe__face--dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-swipe__face {
+    transition: none;
+  }
+}
+
 .card {
   display: flex;
   gap: 12px;

@@ -61,6 +61,27 @@ export function createItemsService(repository: ItemsRepository) {
       }
       return toItem(row);
     },
+
+    /**
+     * Ẩn món (soft delete) — idempotent theo spec UC-06 §4: ẩn một món đã ẩn
+     * (hoặc id không tồn tại) vẫn coi là thành công, không ném ItemNotFound.
+     * repo.softDelete trả null khi món đã ẩn từ trước hoặc không tồn tại → resolve void.
+     */
+    async softDeleteItem(id: string, userId: string): Promise<void> {
+      await repository.softDelete(id, userId);
+    },
+
+    /**
+     * Khôi phục món đã ẩn (nút HOÀN TÁC). Khác DELETE: không idempotent —
+     * không thể khôi phục món đang hiện / không tồn tại → ItemNotFound (404).
+     */
+    async restoreItem(id: string): Promise<Item> {
+      const row = await repository.restore(id);
+      if (!row) {
+        throw new ItemNotFoundError();
+      }
+      return toItem(row);
+    },
   };
 }
 

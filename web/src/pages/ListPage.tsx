@@ -1,19 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { Item, ProductType } from '../api/types';
-import { fetchItems } from '../api/inventory';
+import { deleteItem, fetchItems, restoreItem } from '../api/inventory';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { ItemCard } from '../components/ItemCard';
 import { Spinner } from '../components/Spinner';
 import { SearchIcon, PlusIcon } from '../components/icons';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { Snackbar } from '../components/Snackbar';
 import { PRODUCT_TYPE_FILTERS, roleLabel } from '../lib/labels';
 import './ListPage.css';
 
 type Status = 'loading' | 'ready' | 'error';
 
+interface UndoState {
+  item: Item;
+  index: number;
+}
+
+/** Nhãn ngắn cho snackbar: mã + tên (nếu có). */
+function itemTag(item: Item): string {
+  return item.name ? `${item.code} · ${item.name}` : item.code;
+}
+
 export function ListPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const [items, setItems] = useState<Item[]>([]);
@@ -22,6 +35,11 @@ export function ListPage() {
 
   const [query, setQuery] = useState('');
   const [filterKey, setFilterKey] = useState<string>('all');
+
+  const [pendingHide, setPendingHide] = useState<Item | null>(null);
+  const [hiding, setHiding] = useState(false);
+  const [undo, setUndo] = useState<UndoState | null>(null);
+  const [toastError, setToastError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
 
@@ -62,6 +80,17 @@ export function ListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKey]);
 
+  // Đến từ DetailPage sau khi ẩn món ở đó (step 4): hiện lại snackbar hoàn tác ở đây.
+  // Xoá state ngay để back/forward hoặc F5 không lặp lại snackbar.
+  useEffect(() => {
+    const state = location.state as { undoItem?: Item } | null;
+    if (state?.undoItem) {
+      setUndo({ item: state.undoItem, index: 0 });
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault();
     load({ productType: currentFilter.apiValue, q: query });
@@ -69,6 +98,56 @@ export function ListPage() {
 
   function retry() {
     load({ productType: currentFilter.apiValue, q: query });
+  }
+
+  function requestHide(item: Item) {
+    setPendingHide(item);
+  }
+
+  async function confirmHide() {
+    const item = pendingHide;
+    if (!item) return;
+    setPendingHide(null);
+    setHiding(true);
+
+    const index = items.findIndex((i) => i.id === item.id);
+    setItems((prev) => prev.filter((i) => i.id !== item.id));
+
+    try {
+      await deleteItem(item.id);
+      setUndo({ item, index: index < 0 ? 0 : index });
+    } catch (err) {
+      // Rollback: chèn lại đúng vị trí cũ.
+      setItems((prev) => {
+        const next = [...prev];
+        next.splice(Math.min(index < 0 ? 0 : index, next.length), 0, item);
+        return next;
+      });
+      setToastError(err instanceof ApiError ? err.message : 'Không ẩn được món. Vui lòng thử lại.');
+    } finally {
+      setHiding(false);
+    }
+  }
+
+  async function handleUndo() {
+    const pending = undo;
+    if (!pending) return;
+    setUndo(null);
+
+    // Chèn lại ngay cho mượt, xác nhận với server sau.
+    setItems((prev) => {
+      if (prev.some((i) => i.id === pending.item.id)) return prev;
+      const next = [...prev];
+      next.splice(Math.min(pending.index, next.length), 0, pending.item);
+      return next;
+    });
+
+    try {
+      await restoreItem(pending.item.id);
+    } catch (err) {
+      setItems((prev) => prev.filter((i) => i.id !== pending.item.id));
+      setToastError(err instanceof ApiError ? err.message : 'Không hoàn tác được. Vui lòng thử lại.');
+    }
   }
 
   return (
@@ -135,7 +214,11 @@ export function ListPage() {
           <ul className="list__grid">
             {items.map((item) => (
               <li key={item.id}>
-                <ItemCard item={item} onClick={() => navigate(`/detail/${item.id}`)} />
+                <ItemCard
+                  item={item}
+                  onClick={() => navigate(`/detail/${item.id}`)}
+                  onHide={requestHide}
+                />
               </li>
             ))}
           </ul>
@@ -150,6 +233,29 @@ export function ListPage() {
       >
         <PlusIcon size={26} />
       </button>
+
+      <ConfirmDialog
+        open={pendingHide !== null}
+        title="Ẩn món này?"
+        message="Món sẽ ẩn khỏi danh sách. Ảnh, giá và lịch sử vẫn được giữ lại, bạn có thể hoàn tác sau."
+        confirmLabel="Ẩn món"
+        busy={hiding}
+        onCancel={() => setPendingHide(null)}
+        onConfirm={confirmHide}
+      />
+
+      {undo && (
+        <Snackbar
+          message={`Đã ẩn ${itemTag(undo.item)}`}
+          actionLabel="HOÀN TÁC"
+          onAction={handleUndo}
+          onDismiss={() => setUndo(null)}
+        />
+      )}
+
+      {!undo && toastError && (
+        <Snackbar message={toastError} tone="danger" onDismiss={() => setToastError(null)} />
+      )}
     </div>
   );
 }

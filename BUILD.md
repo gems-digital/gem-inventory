@@ -23,7 +23,8 @@ Mỗi slice kết thúc bằng: test pass + 1 commit (`feat: slice N <màn>`).
 - `GET /inventory/items/:id` → `{ success, data: Item }`.
 - `POST /inventory/items` (auth) body ItemInput → `201 { success, data: Item }`. Validate Zod; mã trùng → 409.
 - `PATCH /inventory/items/:id` (auth) → `{ success, data: Item }`.
-- `DELETE /inventory/items/:id` (admin) → `{ success }`.
+- `DELETE /inventory/items/:id` (auth: staff + admin) → **soft delete** (set `deleted_at`/`deleted_by`, giữ ảnh + `product_id`); `204` no-body; idempotent. Xem design `gem-digital-center-hub/docs/superpowers/specs/2026-10-25-inventory-soft-delete-design.md`.
+- `POST /inventory/items/:id/restore` (auth) → `{ success, data: Item }` — hoàn tác (gỡ `deleted_at`), phục vụ nút HOÀN TÁC. Mọi truy vấn đọc mặc định lọc `deleted_at IS NULL` (món đã ẩn → GET list bỏ qua, GET :id → 404).
 - `POST /inventory/photos/sign` (auth) — **MinIO (S3-compatible)**: body `{ files: [{ contentType }] }` (≤8) → `{ success, data: [{ uploadUrl, publicUrl, key }] }`. `uploadUrl` = presigned S3 PUT (dùng `@aws-sdk/client-s3` + `s3-request-presigner`, path-style), client PUT ảnh thẳng lên đó; `publicUrl` = URL đọc công khai để lưu vào `photoUrls[]`.
 - Header mọi route dữ liệu: `Cache-Control: no-store`. JWT Bearer.
 

@@ -76,6 +76,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     if (onUnauthorized) onUnauthorized();
   }
 
+  // 204/205 không có body (vd DELETE /items/:id) — coi là thành công, data = undefined.
+  if (response.ok && (response.status === 204 || response.status === 205)) {
+    return undefined as T;
+  }
+
   let envelope: ApiEnvelope<T> | null = null;
   try {
     envelope = (await response.json()) as ApiEnvelope<T>;
