@@ -119,6 +119,17 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** Người trong khung tròn — lối vào màn Tài khoản. */
+export function PersonIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M6.5 18a6 6 0 0 1 11 0" />
+    </svg>
+  );
+}
+
 /** Mắt gạch chéo — hành động "Ẩn món" (soft delete). */
 export function EyeOffIcon(props: IconProps) {
   return (

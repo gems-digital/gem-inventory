@@ -6,6 +6,7 @@ import { getAllowedOrigins } from './config/cors-origins.js';
 import { pool } from './db/pool.js';
 import { registerAuthRoutes } from './modules/inventory-pricing/auth/routes.js';
 import { registerItemsRoutes } from './modules/inventory-pricing/items/routes.js';
+import { registerUsersRoutes } from './modules/inventory-pricing/users/routes.js';
 import { registerPhotosRoutes } from './modules/inventory-pricing/photos/routes.js';
 
 /**
@@ -34,9 +35,8 @@ export async function buildServer() {
 
   await registerAuthRoutes(app, pool);
   await registerItemsRoutes(app, pool);
+  await registerUsersRoutes(app, pool);
   await registerPhotosRoutes(app);
-
-  // TODO(plan): app.register(inventoryPricingModule) — users (admin).
 
   return app;
 }

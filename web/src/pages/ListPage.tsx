@@ -6,7 +6,7 @@ import { ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { ItemCard } from '../components/ItemCard';
 import { Spinner } from '../components/Spinner';
-import { SearchIcon, PlusIcon } from '../components/icons';
+import { SearchIcon, PlusIcon, PersonIcon } from '../components/icons';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Snackbar } from '../components/Snackbar';
 import { PRODUCT_TYPE_FILTERS, roleLabel } from '../lib/labels';
@@ -155,6 +155,14 @@ export function ListPage() {
       <header className="list__topbar safe-top">
         <h1 className="list__title">Kho &amp; Giá</h1>
         {user && <span className="list__role">{roleLabel(user.role)}</span>}
+        <button
+          type="button"
+          className="list__account-btn"
+          aria-label="Tài khoản"
+          onClick={() => navigate('/account')}
+        >
+          <PersonIcon size={22} />
+        </button>
       </header>
 
       <form className="list__search" onSubmit={handleSearchSubmit} role="search">

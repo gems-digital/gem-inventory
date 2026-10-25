@@ -101,6 +101,14 @@ export interface AuthUser {
   role: string; // staff | admin
 }
 
+/** GET /users → danh sách user (không có password hash). */
+export interface PublicUser {
+  id: string;
+  username: string;
+  role: string; // staff | admin
+  createdAt: string;
+}
+
 export interface LoginData {
   token: string;
   user: AuthUser;

@@ -1,0 +1,187 @@
+.account {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--ivory);
+}
+
+.account__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.account__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account__user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--jade-soft);
+  color: var(--jade);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.account__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account__user-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.account__user-role {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.account__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account__section-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.account__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account__submit {
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-field);
+  background: var(--jade);
+  color: var(--ivory);
+  font-size: 15px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.account__submit:active:not(:disabled) {
+  background: var(--jade-dark);
+}
+
+.account__submit:disabled {
+  opacity: 0.7;
+}
+
+.account__users-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0;
+}
+
+.account__users-msg {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.account__users-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account__user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.account__user-row:last-child {
+  border-bottom: none;
+}
+
+.account__user-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.account__user-row-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.account__user-row-you {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.account__user-row-role {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.account__reset-btn {
+  flex-shrink: 0;
+  border: 1.5px solid var(--jade);
+  background: transparent;
+  color: var(--jade);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-field);
+}
+
+.account__reset-btn:active {
+  background: var(--jade-soft);
+}
+
+.account__signout {
+  height: 48px;
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius-field);
+  background: transparent;
+  color: var(--danger);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.account__signout:active {
+  background: var(--danger-bg);
+}
+
+/* Nút chính trong dialog đặt lại MK (ConfirmDialog.css chỉ có --cancel/--danger). */
+.confirm-btn--primary {
+  background: var(--jade);
+  color: var(--ivory);
+}
+
+.confirm-btn--primary:active {
+  background: var(--jade-dark);
+}
