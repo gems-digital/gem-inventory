@@ -201,13 +201,15 @@ function UsersSection({ currentUserId, onResetSuccess, onError }: UsersSectionPr
                 </span>
                 <span className="account__user-row-role">{roleLabel(u.role)}</span>
               </div>
-              <button
-                type="button"
-                className="account__reset-btn"
-                onClick={() => setResetTarget(u)}
-              >
-                Đặt lại MK
-              </button>
+              {u.id !== currentUserId && (
+                <button
+                  type="button"
+                  className="account__reset-btn"
+                  onClick={() => setResetTarget(u)}
+                >
+                  Đặt lại MK
+                </button>
+              )}
             </li>
           ))}
         </ul>

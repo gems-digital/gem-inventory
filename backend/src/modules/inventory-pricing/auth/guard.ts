@@ -42,6 +42,7 @@ export function requireRole(role: UserRole) {
 
     if (request.user.role !== role) {
       reply.code(403).send({ success: false, error: 'Không đủ quyền truy cập' });
+      return;
     }
   };
 }

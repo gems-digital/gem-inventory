@@ -5,6 +5,8 @@ import { pool } from '../../../../db/pool.js';
 import { runMigrations } from '../../../../db/migrate.js';
 import { hashPassword } from '../../auth/password.js';
 import { registerAuthRoutes } from '../../auth/routes.js';
+import { createAuthRepository } from '../../auth/repository.js';
+import { createAuthService } from '../../auth/service.js';
 import { registerUsersRoutes } from '../routes.js';
 
 /**
@@ -50,8 +52,11 @@ describe('users routes (integration)', () => {
     await registerUsersRoutes(app, pool);
     await app.ready();
 
-    adminToken = (await login(adminUsername, password)).json().data.token;
-    staffToken = (await login(staffUsername, password)).json().data.token;
+    // Lấy token qua service trực tiếp (không qua /auth/login) để không ăn vào quota
+    // rate-limit của route — route đó chỉ dành ngân sách cho các assertion login thật trong test.
+    const service = createAuthService(createAuthRepository(pool));
+    adminToken = (await service.login(adminUsername, password)).token;
+    staffToken = (await service.login(staffUsername, password)).token;
   });
 
   afterAll(async () => {
@@ -103,14 +108,21 @@ describe('users routes (integration)', () => {
   });
 
   describe('PATCH /users/:id/password', () => {
-    it('returns 403 for a non-admin (staff) token', async () => {
+    it('returns 403 for a non-admin (staff) token and leaves the target password unchanged', async () => {
+      const attemptedPassword = 'reset-by-staff-1';
       const response = await app.inject({
         method: 'PATCH',
         url: `/users/${staffId}/password`,
         headers: { authorization: `Bearer ${staffToken}` },
-        payload: { newPassword: 'reset-by-staff-1' },
+        payload: { newPassword: attemptedPassword },
       });
       expect(response.statusCode).toBe(403);
+
+      const loginOriginal = await login(staffUsername, password);
+      expect(loginOriginal.statusCode).toBe(200);
+
+      const loginAttempted = await login(staffUsername, attemptedPassword);
+      expect(loginAttempted.statusCode).toBe(401);
     });
 
     it('lets an admin reset another user password (204) then that user logs in with the new one', async () => {

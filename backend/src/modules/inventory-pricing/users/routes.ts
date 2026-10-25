@@ -24,10 +24,18 @@ export async function registerUsersRoutes(app: FastifyInstance, pool: Pool): Pro
     },
   );
 
-  // Owner reset MK cho user khác (không cần MK cũ, spec D2).
+  // Owner reset MK cho user khác (không cần MK cũ, spec D2). Rate-limit nhẹ (admin-only) để nhất quán với /auth/*.
   app.patch(
     '/users/:id/password',
-    { preHandler: [requireAuth, requireRole('admin')] },
+    {
+      preHandler: [requireAuth, requireRole('admin')],
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: '1 minute',
+        },
+      },
+    },
     async (request, reply) => {
       const parsedParams = userIdParamsSchema.safeParse(request.params);
       if (!parsedParams.success) {
