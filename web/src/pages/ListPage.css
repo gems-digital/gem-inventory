@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* Đệm top gồm safe-area (notch/Dynamic Island) — bar sticky, tránh ghi đè .safe-top. */
+  /* Bake safe-area-inset-top vào padding-top (shorthand không che mất .safe-top); bar sticky. */
   padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 16px;
   gap: 12px;
 }
@@ -169,7 +169,7 @@
 .fab {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   width: 56px;
   height: 56px;
   border-radius: 50%;

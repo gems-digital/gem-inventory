@@ -12,7 +12,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 72px 24px 40px;
+  /* Đệm top gồm safe-area (notch) — shorthand không làm mất inset của .safe-top. */
+  padding: calc(72px + env(safe-area-inset-top, 0px)) 24px 40px;
   gap: 12px;
 }
 

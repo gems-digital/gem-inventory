@@ -2,7 +2,8 @@
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: 16px;
+  /* Nâng toàn bộ toast lên trên home-indicator (nút HOÀN TÁC khỏi vùng cử chỉ). */
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 30;
   display: flex;
   align-items: center;

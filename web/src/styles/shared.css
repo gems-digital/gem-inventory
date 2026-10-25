@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  /* Đệm top GỒM safe-area (notch/Dynamic Island iOS) — không dùng shorthand
-     cho top để khỏi ghi đè .safe-top; bar sticky nên phải tự chừa vùng tai thỏ. */
+  /* Bake safe-area-inset-top vào padding-top để shorthand không che mất inset
+     của .safe-top (do thứ tự CSS); bar sticky phải tự chừa vùng notch/Dynamic Island. */
   padding: calc(14px + env(safe-area-inset-top, 0px)) 12px 14px;
 }
 
