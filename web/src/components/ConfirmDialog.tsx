@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import './ConfirmDialog.css';
 
 interface ConfirmDialogProps {
@@ -22,11 +23,45 @@ export function ConfirmDialog({
   onCancel,
   onConfirm,
 }: ConfirmDialogProps) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Khi mở: focus nút Huỷ, đóng bằng Escape, bẫy Tab trong sheet (accessibility).
+  useEffect(() => {
+    if (!open) return;
+    cancelRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCancel();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const focusables = sheetRef.current?.querySelectorAll<HTMLElement>('button:not([disabled])');
+      if (!focusables || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open, onCancel]);
+
   if (!open) return null;
 
   return (
     <div className="confirm-overlay" role="presentation" onClick={onCancel}>
       <div
+        ref={sheetRef}
         className="confirm-sheet"
         role="alertdialog"
         aria-modal="true"
@@ -41,7 +76,13 @@ export function ConfirmDialog({
           {message}
         </p>
         <div className="confirm-sheet__actions">
-          <button type="button" className="confirm-btn confirm-btn--cancel" onClick={onCancel} disabled={busy}>
+          <button
+            ref={cancelRef}
+            type="button"
+            className="confirm-btn confirm-btn--cancel"
+            onClick={onCancel}
+            disabled={busy}
+          >
             {cancelLabel}
           </button>
           <button type="button" className="confirm-btn confirm-btn--danger" onClick={onConfirm} disabled={busy}>

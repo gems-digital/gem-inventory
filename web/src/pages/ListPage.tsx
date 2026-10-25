@@ -246,6 +246,7 @@ export function ListPage() {
 
       {undo && (
         <Snackbar
+          key={undo.item.id}
           message={`Đã ẩn ${itemTag(undo.item)}`}
           actionLabel="HOÀN TÁC"
           onAction={handleUndo}
