@@ -6,9 +6,14 @@ echo "=== gem bootstrap $(date) ==="
 
 APP_DIR=/opt/gem-inventory
 
-# --- IP công khai (EIP) + hostnames ---
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-PUBIP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+# --- IP công khai: ưu tiên PUBLIC_IP (Elastic IP Terraform truyền vào, tránh race),
+#     fallback metadata nếu không có ---
+if [ -n "$PUBLIC_IP" ]; then
+  PUBIP="$PUBLIC_IP"
+else
+  TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+  PUBIP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+fi
 if [ -n "$CUSTOM_DOMAIN" ]; then
   APP_DOMAIN="app.$CUSTOM_DOMAIN"; API_DOMAIN="api.$CUSTOM_DOMAIN"; S3_DOMAIN="s3.$CUSTOM_DOMAIN"
 else
@@ -26,6 +31,13 @@ if [ ! -x /usr/libexec/docker/cli-plugins/docker-compose ]; then
   curl -sSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
     -o /usr/libexec/docker/cli-plugins/docker-compose
   chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+fi
+# buildx — BẮT BUỘC: compose build cần buildx >= 0.17, AL2023 không có sẵn
+if [ ! -x /usr/libexec/docker/cli-plugins/docker-buildx ]; then
+  BV=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep -o '"tag_name": "[^"]*"' | head -1 | cut -d'"' -f4)
+  curl -sSL "https://github.com/docker/buildx/releases/download/$BV/buildx-$BV.linux-amd64" \
+    -o /usr/libexec/docker/cli-plugins/docker-buildx
+  chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
 fi
 
 # --- Đọc secret từ SSM Parameter Store ---

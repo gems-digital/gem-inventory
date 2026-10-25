@@ -142,6 +142,7 @@ resource "aws_instance" "gem" {
     export SSM_PREFIX="${var.ssm_prefix}"
     export REPO_URL="${var.repo_url}"
     export CUSTOM_DOMAIN="${var.custom_domain}"
+    export PUBLIC_IP="${var.use_elastic_ip ? aws_eip.gem[0].public_ip : ""}"
     ${file("${path.module}/bootstrap.sh")}
   EOT
   # Đổi user_data không tự tái tạo máy (giữ dữ liệu EBS); chạy lại bằng cách SSM vào máy.
@@ -150,12 +151,17 @@ resource "aws_instance" "gem" {
   tags = { Name = var.name }
 }
 
-# ---- Elastic IP (IP cố định qua các lần tắt/bật) ----
+# ---- Elastic IP (cấp TRƯỚC instance để truyền vào user_data; gắn sau qua association) ----
 resource "aws_eip" "gem" {
-  count    = var.use_elastic_ip ? 1 : 0
-  instance = aws_instance.gem.id
-  domain   = "vpc"
-  tags     = { Name = "${var.name}-eip" }
+  count  = var.use_elastic_ip ? 1 : 0
+  domain = "vpc"
+  tags   = { Name = "${var.name}-eip" }
+}
+
+resource "aws_eip_association" "gem" {
+  count         = var.use_elastic_ip ? 1 : 0
+  instance_id   = aws_instance.gem.id
+  allocation_id = aws_eip.gem[0].id
 }
 
 # ---- Hẹn giờ bật/tắt (EventBridge Scheduler) ----
