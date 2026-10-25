@@ -5,7 +5,7 @@ import { fetchItem, createItem, updateItem } from '../api/inventory';
 import { uploadPhotos } from '../api/photos';
 import { ApiError } from '../api/client';
 import { Spinner } from '../components/Spinner';
-import { BackIcon, PlusIcon, CloseIcon, CameraIcon } from '../components/icons';
+import { BackIcon, PlusIcon, CloseIcon, CameraIcon, StarIcon } from '../components/icons';
 import { TextField, SelectField, Segmented, ChipGroup } from '../components/FormFields';
 import { productTypeLabel } from '../lib/labels';
 import {
@@ -172,6 +172,17 @@ export function AddEditPage() {
     });
   }
 
+  // Đặt ảnh thứ `index` làm đại diện: chuyển lên đầu (photoUrls[0]), giữ thứ tự các ảnh còn lại.
+  function setCover(index: number) {
+    setForm((prev) => {
+      if (index <= 0 || index >= prev.photos.length) return prev;
+      const next = [...prev.photos];
+      const [chosen] = next.splice(index, 1);
+      next.unshift(chosen);
+      return { ...prev, photos: next };
+    });
+  }
+
   function onItemKind(value: string) {
     // Độc bản: tồn mặc định 1.
     patch({ itemKind: value, quantity: value === 'unique' ? '1' : form.quantity });
@@ -290,7 +301,22 @@ export function AddEditPage() {
                 >
                   <CloseIcon size={14} />
                 </button>
-                {i === 0 && <span className="photo-cell__badge">Đại diện</span>}
+                {i === 0 ? (
+                  <span className="photo-cell__badge">
+                    <StarIcon size={12} fill="currentColor" />
+                    Đại diện
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="photo-cell__cover"
+                    aria-label="Đặt làm ảnh đại diện"
+                    onClick={() => setCover(i)}
+                  >
+                    <StarIcon size={12} />
+                    Đặt đại diện
+                  </button>
+                )}
               </div>
             ))}
             {form.photos.length < MAX_PHOTOS && (
@@ -328,6 +354,9 @@ export function AddEditPage() {
               e.target.value = '';
             }}
           />
+          {form.photos.length > 1 && (
+            <p className="photo-hint">Ảnh đầu tiên là ảnh đại diện. Chạm ☆ trên ảnh khác để đổi.</p>
+          )}
           {fieldErrors.photos && <p className="form-field-error">{fieldErrors.photos}</p>}
         </section>
 

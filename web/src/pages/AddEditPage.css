@@ -91,16 +91,39 @@
   padding: 0;
 }
 
-.photo-cell__badge {
+.photo-cell__badge,
+.photo-cell__cover {
   position: absolute;
   bottom: 4px;
   left: 4px;
-  background: var(--jade);
-  color: var(--ivory);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 11px;
   font-weight: 600;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 8px;
+  color: var(--ivory);
+}
+
+.photo-cell__badge {
+  background: var(--jade);
+}
+
+.photo-cell__cover {
+  border: none;
+  background: rgba(26, 36, 30, 0.62);
+  cursor: pointer;
+}
+
+.photo-cell__cover:active {
+  background: var(--jade-dark);
+}
+
+.photo-hint {
+  margin: 8px 2px 0;
+  font-size: 12.5px;
+  color: var(--muted);
 }
 
 .photo-add {

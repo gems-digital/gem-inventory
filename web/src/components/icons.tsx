@@ -140,3 +140,12 @@ export function EyeOffIcon(props: IconProps) {
     </svg>
   );
 }
+
+/** Ngôi sao — đánh dấu ảnh đại diện. Truyền fill="currentColor" để tô đặc (đang là đại diện). */
+export function StarIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3.5l2.6 5.3 5.9.85-4.25 4.15 1 5.85-5.25-2.75-5.25 2.75 1-5.85L3.5 9.65l5.9-.85z" />
+    </svg>
+  );
+}
