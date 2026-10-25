@@ -53,16 +53,24 @@ async function main(): Promise<void> {
     }
   }
 
-  const items = await seedItems(pool, adminUserId);
+  // Món mẫu chỉ seed cho dev; production đặt SEED_DEMO_ITEMS=false để DB luôn trống.
+  const seedDemo = process.env.SEED_DEMO_ITEMS !== 'false';
 
   // eslint-disable-next-line no-console
-  console.log('✅ Seed xong. Thông tin đăng nhập dev:');
+  console.log('✅ Seed xong. Thông tin đăng nhập:');
   for (const user of users) {
     // eslint-disable-next-line no-console
     console.log(`  - ${user.role}: username=${user.username} password=${user.password}`);
   }
-  // eslint-disable-next-line no-console
-  console.log(`✅ Seed ${items.length} inventory_item mẫu: ${items.map((i) => i.code).join(', ')}`);
+
+  if (seedDemo) {
+    const items = await seedItems(pool, adminUserId);
+    // eslint-disable-next-line no-console
+    console.log(`✅ Seed ${items.length} inventory_item mẫu: ${items.map((i) => i.code).join(', ')}`);
+  } else {
+    // eslint-disable-next-line no-console
+    console.log('ℹ️  SEED_DEMO_ITEMS=false → bỏ qua món mẫu (DB trống).');
+  }
 }
 
 main()
